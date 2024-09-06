@@ -2,46 +2,46 @@
 @import '../css/animate.css';
 
 /* tippy css */
-@import './assets/css/tippy.css';
+@import '../css/tippy.css';
 
 /* swiper css */
-@import './assets/css/swiper.css';
+@import '../css/swiper.css';
 
 /* Elements - Progressbar */
-@import './assets/css/progressbar.css';
+@import '../css/progressbar.css';
 
 /* Data tables css */
-@import './assets/css/datatables.css';
+@import '../css/datatables.css';
 
 /* scrumboard */
-@import './assets/css/scrumboard.css';
+@import '../css/scrumboard.css';
 
 /* calendar css */
-@import './assets/css/fullcalendar.css';
+@import '../css/fullcalendar.css';
 
 /* sweetalert css */
-@import './assets/css/sweetalert.css';
+@import '../css/sweetalert.css';
 
 /* flatpickr css */
-@import './assets/css/flatpickr.css';
+@import '../css/flatpickr.css';
 
 /* quill-editor css */
-@import './assets/css/quill-editor.css';
+@import '../css/quill-editor.css';
 
 /* markdown-editor css */
-@import './assets/css/markdown-editor.css';
+@import '../css/markdown-editor.css';
 
 /* file upload with preview */
-@import './assets/css/file-upload-preview.css';
+@import '../css/file-upload-preview.css';
 
 /* dragndrop*/
-@import './assets/css/dragndrop.css';
+@import '../css/dragndrop.css';
 
 /* form element*/
-@import './assets/css/form-elements.css';
+@import '../css/form-elements.css';
 
 /* Select2*/
-@import './assets/css/select2.css';
+@import '../css/select2.css';
 
 @tailwind base;
 @tailwind components;
