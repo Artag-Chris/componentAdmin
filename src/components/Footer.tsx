@@ -1,9 +1,9 @@
-const Footer: React.FC = () => {
-    return (
-      <footer>
-        <p>© 2023 My Vite Project</p>
-      </footer>
-    );
-  };
-  
-  export default Footer;
+const Footer = () => {
+  return (
+    <footer className="bg-blue-600 text-white p-4">
+      <p className="text-center">Footer</p>
+    </footer>
+  );
+};
+
+export default Footer;
