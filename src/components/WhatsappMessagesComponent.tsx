@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import useWhatsappData from './hook/useWhatsappData'; // Asegúrate de importar el hook personalizado
 import { User } from './interfaces';
+import { numberParser } from './functions/numberParser';
 
 
 interface WhatsappMessagesComponentProps {
@@ -14,10 +15,10 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ o
   const handleClick = (item: User) => {
     //console.log('Clicked item:', item);
     if (socket && socket.readyState === WebSocket.OPEN) {
-      console.log(item);
+      //console.log(item);
       socket.send(JSON.stringify(item));
     }
-    onSelectUser(item); // Llamar a onSelectUser cuando se haga clic en un usuario
+    onSelectUser(item); 
   };
 
   const initializeWebSocket = () => {
@@ -69,8 +70,8 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ o
             className="m-2 p-4 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"
             onClick={() => handleClick(item)}
           >
-            <p>Phone: {item.phone}</p>
-            <p>Name: {item.name}</p>
+            <p>Nombre: {item.name}</p>
+            <p>Telefono: {numberParser(item.phone)}</p>
             {/* Renderiza más campos según sea necesario */}
           </div>
         ))}

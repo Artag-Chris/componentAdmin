@@ -19,8 +19,7 @@ const HomePage= () => {
         <h1>Whatsapp</h1>
         <WhatsappMessagesComponent onSelectUser={handleSelectUser} />
       </div>
-      <div className="flex-1 p-4 bg-gray-700">
-        <h1>Chat</h1>
+      <div className="flex-1 p-4 bg-pink-700">
         <ChatWhatsappComponent user={selectedUser} />
       </div>
     </div>

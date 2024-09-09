@@ -8,11 +8,11 @@ export interface User {
     atending:number;
     lastActive: Date;
     wppStatus:WhatsappStatus;
-    WhatsappMessage?: any[],
-    WhatsappImage?  : any[],
-    WhatsappAudio?  : any[],
-    WhatsappVideo?  : any[],
-    WhatsappDoc  ?  : any[],
+    WhatsappMessage?: WhatsappMessage[],
+    WhatsappImage?  : WhatsappImage[],
+    WhatsappAudio?  : WhatsappAudio[],
+    WhatsappVideo?  : WhatsappVideo[],
+    WhatsappDoc  ?  : WhatsappDoc[],
     detail          : String          
 
     // Agrega más campos según sea necesario
@@ -26,3 +26,57 @@ export interface User {
     "blocked"
   }
 
+export interface WhatsappMessage {
+  id: number,
+  message: string,
+  to:string,
+  status: string,
+  direction: string,
+  type: string,
+  mediaId: "",
+  attendant: number,
+}
+
+export interface WhatsappImage {
+  id: number,
+  message: string,//archivo de base64
+  to:string,
+  status: string,
+  direction: string,
+  type: string,
+  mediaId: "",
+  attendant: number,
+}
+
+export interface WhatsappAudio {
+  id: number,
+  message: string,//archivo de base64
+  to:string,
+  status: string,
+  direction: string,
+  type: string,
+  mediaId: "",
+  attendant: number,
+}
+
+export interface WhatsappVideo {
+  id: number,
+  message: string,//archivo de base64
+  to:string,
+  status: string,
+  direction: string,
+  type: string,
+  mediaId: "",
+  attendant: number,
+}
+
+export interface WhatsappDoc {
+  id: number,
+  message: string,
+  to:string,
+  status: string,
+  direction: string,
+  type: string,
+  mediaId: "",
+  attendant: number,
+}
