@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { User, WhatsappMessage } from './interfaces';
 import "./css/chatComponent.css";
+import useSpecificData from './hook/useSpecificUserData';
 
 interface ChatComponentProps {
   user: User | null;
@@ -9,6 +10,8 @@ interface ChatComponentProps {
 const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
   const [newMessage, setNewMessage] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { data, loading, error } = useSpecificData(user?.phone);
+
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
@@ -20,6 +23,8 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     setNewMessage('');
   };
 
+{ /* 
+  
   useEffect(() => {
     if (user?.WhatsappImage?.length) {
       const mensaje = user.WhatsappImage[0].message.data;
@@ -36,15 +41,18 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     } else {
       setImageUrl(null); // Asegurarse de limpiar la URL si no hay imagen
     }
-  }, [user]);
+  }, [user]); 
+
+  */}  
 
   if (!user) {
     return null; // No renderizar nada si no hay un usuario seleccionado
   }
-
+ console.log(data)
   return (
     <div className="chat-container">
       <h2>{user.name}</h2>
+      {}
       <div className="messages-container">
         {user.WhatsappMessage && user.WhatsappMessage.length > 0 ? (
           user.WhatsappMessage.map((message: WhatsappMessage) => (
