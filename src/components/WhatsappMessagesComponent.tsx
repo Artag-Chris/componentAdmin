@@ -3,22 +3,19 @@ import useWhatsappData from './hook/useWhatsappData'; // Asegúrate de importar 
 import { User } from './interfaces';
 import { numberParser } from './functions/numberParser';
 
-
 interface WhatsappMessagesComponentProps {
   onSelectUser: (user: User) => void;
 }
 
-const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ onSelectUser }) => {
-  const { data, loading, error, setData } = useWhatsappData();
+const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ onSelectUser, }) => {
+  const { data, loading, error, setData, refreshData } = useWhatsappData();
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const handleClick = (item: User) => {
-    //console.log('Clicked item:', item);
     if (socket && socket.readyState === WebSocket.OPEN) {
-      //console.log(item);
       socket.send(JSON.stringify(item));
     }
-    onSelectUser(item); 
+    onSelectUser(item);
   };
 
   const initializeWebSocket = () => {
@@ -63,6 +60,7 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ o
   return (
     <div className="p-4 bg-gray-800 text-white">
       <h1>API Data</h1>
+      <button onClick={refreshData} className="refresh-button">Refresh Data</button>
       <div className="grid grid-cols-1 gap-2">
         {data.map((item: User) => (
           <div
