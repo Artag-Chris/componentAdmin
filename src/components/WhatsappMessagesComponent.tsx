@@ -1,63 +1,55 @@
+import { useState, useEffect } from 'react';
+import useWhatsappData from './hook/useWhatsappData'; // Asegúrate de importar el hook personalizado
+;
 
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-
-
-const WhatsappMessages= () => {
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-
+const WhatsappMessages = () => {
+  const { data, loading, error, setData } = useWhatsappData();
+  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const handleClick = (item: any) => {
-    console.log('Clicked item:', item);
+    //console.log('Clicked item:', item);
     if (socket && socket.readyState === WebSocket.OPEN) {
-      socket.send(item);
+      console.log(item)
+      socket.send(JSON.stringify(item));
     }
   };
- 
-  useEffect(() => {
-    const fetchData = async () => {
-      const storedData = localStorage.getItem('whatsappData');
-      if (storedData) {
-        setData(JSON.parse(storedData));
-        setLoading(false);
-      } else {
-        try {
-          const response = await axios.get<any[]>('http://localhost:4000/api/prisma/users');
-          setData(response.data);
-          localStorage.setItem('whatsappData', JSON.stringify(response.data));
-          setLoading(false);
-        } catch (err) {
-          setError('Error fetching data');
-          setLoading(false);
-        }
-      }
-    };
-    fetchData();
-  }, []);
 
-  //TODO metodo para reconectarse si ya no esta conectado 
-  const socket = new WebSocket('ws://localhost:4000/ws');
+  const initializeWebSocket = () => {
+    const ws = new WebSocket('ws://localhost:4000/ws');
 
-    socket.onopen = () => {
+    ws.onopen = () => {
       console.log('WebSocket connection established');
     };
 
-    socket.onmessage = (event) => {
+    ws.onmessage = (event) => {
       const newData = JSON.parse(event.data);
       setData((prevData) => [...prevData, ...newData]);
       localStorage.setItem('whatsappData', JSON.stringify([...data, ...newData]));
     };
 
-    socket.onerror = (error) => {
+    ws.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
 
-    socket.onclose = () => {
-      console.log('WebSocket connection closed');
+    ws.onclose = () => {
+      console.log('WebSocket connection closed. Attempting to reconnect in 5 seconds...');
+      setTimeout(() => {
+        initializeWebSocket();
+      }, 5000);
     };
+
+    setSocket(ws);
+  };
+
+  useEffect(() => {
+    initializeWebSocket();
+
+    return () => {
+      if (socket) {
+        socket.close();
+      }
+    };
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -86,6 +78,5 @@ const WhatsappMessages= () => {
     </div>
   );
 };
-
 
 export default WhatsappMessages;
