@@ -9,7 +9,7 @@ import useWhatsappData from '../components/hook/useWhatsappData';
 
 const HomePage= () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const { data, loading, error, refreshData } = useWhatsappData();
+  const { loading, error, refreshData } = useWhatsappData();
 
   const handleSelectUser = (user: User) => {
     setSelectedUser(user);
