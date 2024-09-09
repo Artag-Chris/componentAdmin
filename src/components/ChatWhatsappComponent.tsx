@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { User, WhatsappMessage } from './interfaces';
-import "./css/chatComponent.css"
+import "./css/chatComponent.css";
+
 interface ChatComponentProps {
   user: User | null;
 }
 
 const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
   const [newMessage, setNewMessage] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
@@ -17,6 +19,24 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     // Limpiar el campo de entrada después de enviar el mensaje
     setNewMessage('');
   };
+
+  useEffect(() => {
+    if (user?.WhatsappImage?.length) {
+      const mensaje = user.WhatsappImage[0].message.data;
+      const blob = new Blob([new Uint8Array(mensaje)], { type: 'image/jpeg' });
+
+      // Crear una URL de objeto a partir del Blob
+      const url = URL.createObjectURL(blob);
+      setImageUrl(url);
+
+      // Limpiar la URL de objeto cuando el componente se desmonte
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setImageUrl(null); // Asegurarse de limpiar la URL si no hay imagen
+    }
+  }, [user]);
 
   if (!user) {
     return null; // No renderizar nada si no hay un usuario seleccionado
@@ -37,6 +57,13 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
           ))
         ) : (
           <p>No messages available.</p>
+        )}
+      </div>
+      <div>
+        {imageUrl && (
+          <div>
+            <img src={imageUrl} alt="Imagen" />
+          </div>
         )}
       </div>
       <div className="message-input-container">

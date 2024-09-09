@@ -39,7 +39,7 @@ export interface WhatsappMessage {
 
 export interface WhatsappImage {
   id: number,
-  message: string,//archivo de base64
+  message: WhatsappImageData ,//archivo de base64
   to:string,
   status: string,
   direction: string,
@@ -80,3 +80,8 @@ export interface WhatsappDoc {
   mediaId: "",
   attendant: number,
 }
+
+ interface WhatsappImageData {
+    type: string;
+    data: ArrayBufferLike;
+  };
