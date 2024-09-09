@@ -1,17 +1,30 @@
-import WhatsappMessagesComponent from "../components/WhatsappMessagesComponent";
+import { useState } from 'react';
+import WhatsappMessagesComponent from '../components/WhatsappMessagesComponent';
+import ChatWhatsappComponent from '../components/ChatWhatsappComponent';
+import { User } from '../components/interfaces';
 
-const HomePage = () => {
+
+
+
+const HomePage= () => {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  const handleSelectUser = (user: User) => {
+    setSelectedUser(user);
+  };
+
   return (
     <div className="flex h-screen bg-gray-800 text-white">
       <div className="flex-3 p-4">
         <h1>Whatsapp</h1>
-        <WhatsappMessagesComponent />
+        <WhatsappMessagesComponent onSelectUser={handleSelectUser} />
       </div>
       <div className="flex-1 p-4 bg-gray-700">
-        <h1>Otro Componente</h1>
-        {/* Aquí puedes renderizar otro componente */}
+        <h1>Chat</h1>
+        <ChatWhatsappComponent user={selectedUser} />
       </div>
     </div>
   );
 };
+
 export default HomePage;
