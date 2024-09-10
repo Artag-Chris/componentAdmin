@@ -16,7 +16,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     if (newMessage.trim() === '') return;
     // Agregar el nuevo mensaje al estado de mensajes
     setMessages([...messages, newMessage]);
-  };
+  };  
 
   useEffect(() => {
     if (data?.WhatsappImage?.length) {
