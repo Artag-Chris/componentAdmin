@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { User, WhatsappImage, WhatsappMessage } from './interfaces';
-import "./css/chatComponent.css";
 import useSpecificData from './hook/useSpecificUserData';
 
 interface ChatComponentProps {
@@ -12,7 +11,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { data, loading, error } = useSpecificData(user?.phone);
 
-
   const handleSendMessage = () => {
     if (newMessage.trim() === '') return;
 
@@ -23,9 +21,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     setNewMessage('');
   };
 
-  //funcion para ver si hay imagnes y colocarlas en un url
-  
-    useEffect(() => {
+  useEffect(() => {
     if (data?.WhatsappImage?.length) {
       const mensaje = data.WhatsappImage[0].message.data;
       const blob = new Blob([new Uint8Array(mensaje)], { type: 'image/jpeg' });
@@ -41,63 +37,63 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     } else {
       setImageUrl(null); // Asegurarse de limpiar la URL si no hay imagen
     }
-  }, [user]); 
-
-    
-  if(data){
-    console.log(data.WhatsappImage)
-  }  
- 
-   
+  }, [user]);
 
   if (!user) {
     return null; // No renderizar nada si no hay un usuario seleccionado
   }
-  
+
   return (
-    <div className="chat-container">
-      <h2>{user.name}</h2>
-      {}
-      <div className="messages-container">
-        {user.WhatsappMessage && user.WhatsappMessage.length > 0 ? (
-          user.WhatsappMessage.map((message: WhatsappMessage) => (
-            <div
-              key={message.id}
-              className={`message ${message.direction === 'incoming' ? 'incoming' : 'outgoing'}`}
-            >
-              <p>{message.message}</p>
-            </div>
-          ))
-        ) : (
-          <p>No messages available.</p>
-        )}
-      </div>
-      <div>
-      <div className="images-container">
-        {data!.WhatsappImage && data!.WhatsappImage.length > 0 ? (
-          data!.WhatsappImage.map((image: WhatsappImage) => {
-            const blob = new Blob([new Uint8Array(image.message.data)], { type: 'image/jpeg' });
-            const url = URL.createObjectURL(blob);
-            return (
-              <div key={image.id} className={`message ${image.direction === 'incoming' ? 'incoming' : 'outgoing'}`}>
-                <img src={url} alt="Whatsapp Image" />
+    <div className="flex flex-col h-full p-4 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-4">{user.name}</h2>
+      <div className="flex-1 overflow-y-auto mb-4">
+        <div className="messages-container space-y-4">
+          {user.WhatsappMessage && user.WhatsappMessage.length > 0 ? (
+            user.WhatsappMessage.map((message: WhatsappMessage) => (
+              <div
+                key={message.id}
+                className={`message p-4 rounded-lg shadow-sm max-w-[30%] ${
+                  message.direction === 'incoming' ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'
+                }`}
+              >
+                <p>{message.message}</p>
               </div>
-            );
-          })
-        ) : (
-          <p>No images available.</p>
-        )}
+            ))
+          ) : (
+            <p>No messages available.</p>
+          )}
+          {/* Mensaje de demostración */}
+          <div className="message p-4 rounded-lg shadow-sm max-w-[30%] bg-gray-300 self-end">
+            <p>buenos dias.</p>
+          </div>
+        </div>
+        <div className="images-container space-y-4 mt-4">
+          {data!.WhatsappImage && data!.WhatsappImage.length > 0 ? (
+            data!.WhatsappImage.map((image: WhatsappImage) => {
+              const blob = new Blob([new Uint8Array(image.message.data)], { type: 'image/jpeg' });
+              const url = URL.createObjectURL(blob);
+              return (
+                <div key={image.id} className={`message p-4 rounded-lg shadow-sm max-w-[30%] ${image.direction === 'incoming' ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'}`}>
+                  <img src={url} alt="Whatsapp Image" className="max-w-full h-auto rounded-lg" />
+                </div>
+              );
+            })
+          ) : (
+            <p>No images available.</p>
+          )}
+        </div>
       </div>
-      </div>
-      <div className="message-input-container">
+      <div className="message-input-container flex mt-4">
         <input
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type a message"
-          className="message-input"
+          className="flex-1 p-2 border border-gray-300 rounded-l-lg"
         />
-        <button onClick={handleSendMessage} className="send-button">Send</button>
+        <button onClick={handleSendMessage} className="p-2 bg-blue-500 text-white rounded-r-lg">
+          Send
+        </button>
       </div>
     </div>
   );
