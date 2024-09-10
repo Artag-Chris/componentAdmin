@@ -709,3 +709,21 @@ hover:text-primary hover:before:!bg-primary ltr:before:mr-2 rtl:before:ml-2 dark
 pre.hljs {
   @apply p-6 rounded-md overflow-x-auto !bg-[#191e3a];
 }
+/*  responsive    */
+@media (min-width: 768px) {
+  .sidebar {
+    width: 25%;
+  }
+  .main-content {
+    width: 75%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    width: 20%;
+  }
+  .main-content {
+    width: 80%;
+  }
+}
