@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { User, WhatsappImage, WhatsappMessage } from './interfaces';
 import useSpecificData from './hook/useSpecificUserData';
+import ChatInput from './ChatInputComonent';
 
 interface ChatComponentProps {
   user: User | null;
@@ -43,17 +44,19 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     return null; // No renderizar nada si no hay un usuario seleccionado
   }
 
+
+
   return (
     <div className="flex flex-col h-full p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">{user.name}</h2>
       <div className="flex-1 overflow-y-auto mb-4">
         <div className="messages-container space-y-4">
-          {user.WhatsappMessage && user.WhatsappMessage.length > 0 ? (
-            user.WhatsappMessage.map((message: WhatsappMessage) => (
+          {data!.WhatsappMessage && data!.WhatsappMessage.length > 0 ? (
+            data!.WhatsappMessage.map((message: WhatsappMessage) => (
               <div
                 key={message.id}
                 className={`message p-4 rounded-lg shadow-sm max-w-[30%] ${
-                  message.direction === 'incoming' ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'
+                  message.direction === "outgoing" ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'
                 }`}
               >
                 <p>{message.message}</p>
@@ -73,7 +76,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
               const blob = new Blob([new Uint8Array(image.message.data)], { type: 'image/jpeg' });
               const url = URL.createObjectURL(blob);
               return (
-                <div key={image.id} className={`message p-4 rounded-lg shadow-sm max-w-[30%] ${image.direction === 'incoming' ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'}`}>
+                <div key={image.id} className={`message p-4 rounded-lg shadow-sm max-w-[30%] ${image.direction === 'outgoing' ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'}`}>
                   <img src={url} alt="Whatsapp Image" className="max-w-full h-auto rounded-lg" />
                 </div>
               );
@@ -83,17 +86,9 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
           )}
         </div>
       </div>
-      <div className="message-input-container flex mt-4">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message"
-          className="flex-1 p-2 border border-gray-300 rounded-l-lg"
-        />
-        <button onClick={handleSendMessage} className="p-2 bg-blue-500 text-white rounded-r-lg">
-          Send
-        </button>
+      <div >
+       
+          <ChatInput onSendMessage={handleSendMessage} />
       </div>
     </div>
   );
