@@ -1,13 +1,10 @@
-import { useState } from 'react';
-import WhatsappMessagesComponent from '../components/WhatsappMessagesComponent';
-import ChatWhatsappComponent from '../components/ChatWhatsappComponent';
-import { User } from '../components/interfaces';
-import useWhatsappData from '../components/hook/useWhatsappData';
+import { useState } from "react";
+import WhatsappMessagesComponent from "../components/WhatsappMessagesComponent";
+import ChatWhatsappComponent from "../components/ChatWhatsappComponent";
+import { User } from "../components/interfaces";
+import useWhatsappData from "../components/hook/useWhatsappData";
 
-
-
-
-const HomePage= () => {
+const HomePage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const { loading, error, refreshData } = useWhatsappData();
 
@@ -16,16 +13,21 @@ const HomePage= () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-800 text-white">
-      <div className="flex-3 p-4">
-        <h1>Whatsapp</h1>
-        <button onClick={refreshData} className="refresh-button">Refresh Data</button>
+    <div className="flex flex-col md:flex-row h-screen bg-white text-black">
+      <div className="w-full md:w-3/12 p-4 bg-gray-100 rounded-lg">
+        <h1 className="text-2xl font-bold">Whatsapp</h1>
+        <button
+          onClick={refreshData}
+          className="mt-4 mb-4 p-2 bg-gray-300 hover:bg-gray-400 text-black rounded-full"
+        >
+          Buscar nuevos Mensajes
+        </button>
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
-        <WhatsappMessagesComponent  onSelectUser={handleSelectUser} />
+        <WhatsappMessagesComponent onSelectUser={handleSelectUser} />
       </div>
-      <div className="flex-1 p-4 bg-gray-700">
-        <h1>Chat</h1>
+      <div className={`w-full md:w-9/12 p-4 bg-gray-200 rounded-lg ${selectedUser ? "block" : "hidden"} md:block`}>
+        <h1 className="text-2xl font-bold">Chat</h1>
         <ChatWhatsappComponent user={selectedUser} />
       </div>
     </div>

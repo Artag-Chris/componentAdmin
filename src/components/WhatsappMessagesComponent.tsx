@@ -7,15 +7,20 @@ interface WhatsappMessagesComponentProps {
   onSelectUser: (user: User) => void;
 }
 
-const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ onSelectUser, }) => {
+const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ onSelectUser }) => {
   const { data, loading, error, setData, refreshData } = useWhatsappData();
   const [socket, setSocket] = useState<WebSocket | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const handleClick = (item: User) => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       socket.send(JSON.stringify(item));
     }
     onSelectUser(item);
+    if (item.id !== undefined) {
+      setSelectedUserId(item.id);
+    }
+   
   };
 
   const initializeWebSocket = () => {
@@ -58,17 +63,24 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({ o
   }
 
   return (
-    <div className="p-4 bg-gray-800 text-white">
-      <h1>API Data</h1>
-      <button onClick={refreshData} className="refresh-button">Refresh Data</button>
-      <div className="grid grid-cols-1 gap-2">
+    <div className="p-4 bg-white text-black rounded-lg shadow-md">
+      <h1 className="text-2xl font-bold mb-4">Clientes en Espera</h1>
+      <button
+        onClick={refreshData}
+        className="mb-4 p-2 bg-gray-300 hover:bg-gray-400 text-black rounded-full"
+      >
+        Refresh Data
+      </button>
+      <div className="grid grid-cols-1 gap-4">
         {data.map((item: User) => (
           <div
             key={item.id}
-            className="m-2 p-4 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600"
+            className={`m-2 p-4 bg-gray-100 rounded-lg shadow-lg cursor-pointer hover:bg-gray-200 ${
+              selectedUserId === item.id ? 'bg-white shadow-inner' : ''
+            }`}
             onClick={() => handleClick(item)}
           >
-            <p>Nombre: {item.name}</p>
+            <p className="font-semibold">Nombre: {item.name}</p>
             <p>Telefono: {numberParser(item.phone)}</p>
             {/* Renderiza más campos según sea necesario */}
           </div>
