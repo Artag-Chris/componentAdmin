@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { WhatsappAudio, WhatsappDoc, WhatsappImage, WhatsappMessage, WhatsappVideo } from '../interfaces';
+import { User, WhatsappAudio, WhatsappDoc, WhatsappImage, WhatsappMessage, WhatsappVideo } from '../interfaces';
 
 interface SpecificData {
   whatsappMessage?: WhatsappMessage,
@@ -11,7 +11,7 @@ interface SpecificData {
 }
 
 const useSpecificData = (id?: string | null) => {
-  const [data, setData] = useState<SpecificData | null>(null);
+  const [data, setData] = useState<User| null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,7 +27,7 @@ const useSpecificData = (id?: string | null) => {
     setError(null);
 
     try {
-      const response = await axios.get<SpecificData>(`http://localhost:4000/api/prisma/user/${id}`);
+      const response = await axios.get<User>(`http://localhost:4000/api/prisma/deepSearchForAllMessages/${id}`);
      // console.log(response.data)
       setData(response.data);
     } catch (err:any) {
