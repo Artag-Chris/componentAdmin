@@ -41,7 +41,7 @@ const useSpecificData = (id?: string | null) => {
     fetchData();
   }, [id, fetchData]);
 
-  return { data, loading, error };
+  return { data, loading, error,setLoading };
 };
 
 export default useSpecificData;

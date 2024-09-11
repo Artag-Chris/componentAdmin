@@ -1,8 +1,9 @@
 import { useState } from "react";
-import WhatsappMessagesComponent from "../components/WhatsappMessagesComponent";
-import ChatWhatsappComponent from "../components/ChatWhatsappComponent";
+//import WhatsappMessagesComponent from "../components/WhatsappMessagesComponent";
 import { User } from "../components/interfaces";
 import useWhatsappData from "../components/hook/useWhatsappData";
+import ChatWhatsappComponetClone from "../components/ChatWhatsappComponetClone";
+import WhatsappMessagesComponent from "../components/WhatsappMessagesComponent";
 
 const HomePage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -24,11 +25,17 @@ const HomePage = () => {
         </button>
         {loading && <p>Loading...</p>}
         {error && <p>{error}</p>}
-        <WhatsappMessagesComponent onSelectUser={handleSelectUser} />
+        <WhatsappMessagesComponent onSelectUser={handleSelectUser}/> 
+      
       </div>
-      <div className={`w-full md:w-9/12 p-4 bg-gray-200 rounded-lg ${selectedUser ? "block" : "hidden"} md:block`}>
+      <div
+        className={`w-full md:w-9/12 p-4 bg-gray-200 rounded-lg ${
+          selectedUser ? "block" : "hidden"
+        } md:block`}
+      >
         <h1 className="text-2xl font-bold">Chat</h1>
-        <ChatWhatsappComponent user={selectedUser} />
+        { /*selectedUser && <ChatWhatsappComponentClone user={selectedUser} /> */}
+        <ChatWhatsappComponetClone />
       </div>
     </div>
   );
