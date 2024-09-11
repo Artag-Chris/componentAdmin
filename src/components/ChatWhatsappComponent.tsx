@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { User, WhatsappImage, WhatsappMessage } from './interfaces';
+import React, { useEffect, useState, useRef } from 'react';
+import { User, WhatsappMessage, WhatsappImage, WhatsappAudio, WhatsappVideo, WhatsappDoc, } from './interfaces';
 import useSpecificData from './hook/useSpecificUserData';
 import ChatInput from './ChatInputComonent';
+import { Loader2, File, Play, Pause } from 'lucide-react';
 
 interface ChatComponentProps {
   user: User | null;
@@ -9,92 +10,125 @@ interface ChatComponentProps {
 
 const ChatWhatsappComponent: React.FC<ChatComponentProps> = ({ user }) => {
   const [messages, setMessages] = useState<string[]>([]);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { data, loading, error } = useSpecificData(user?.phone);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const [isPlaying, setIsPlaying] = useState<{ [key: number]: boolean }>({});
 
   const handleSendMessage = (newMessage: string) => {
     if (newMessage.trim() === '') return;
-    // Agregar el nuevo mensaje al estado de mensajes
     setMessages([...messages, newMessage]);
-  };  
+  };
 
   useEffect(() => {
-    if (data?.WhatsappImage?.length) {
-      const mensaje = data.WhatsappImage[0].message.data;
-      const blob = new Blob([new Uint8Array(mensaje)], { type: 'image/jpeg' });
-      // Crear una URL de objeto a partir del Blob
-      const url = URL.createObjectURL(blob);
-      setImageUrl(url);
-      // Limpiar la URL de objeto cuando el componente se desmonte
-      return () => {
-        URL.revokeObjectURL(url);
-      };
-    } else {
-      setImageUrl(null); // Asegurarse de limpiar la URL si no hay imagen
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
-  }, [user]);
+  }, [data, messages]);
 
-  if (!data) {
-    return null; // No renderizar nada si no hay un usuario seleccionado
+  const renderMessage = (message: WhatsappMessage | WhatsappImage | WhatsappAudio | WhatsappVideo | WhatsappDoc) => {
+    const isOutgoing = message.direction === 'outgoing';
+    const baseClasses = `p-4 rounded-lg shadow-sm max-w-[70%] ${
+      isOutgoing ? 'bg-blue-500 text-white self-end' : 'bg-gray-200 self-start'
+    }`;
+
+    switch (message.type) {
+      case 'text':
+        return (
+          <div key={message.id} className={baseClasses}>
+            <p>{(message as WhatsappMessage).message}</p>
+          </div>
+        );
+      case 'image':
+        const imageMessage = message as WhatsappImage;
+        const imageBlob = new Blob([new Uint8Array(imageMessage.message.data)], { type: 'image/jpeg' });
+        const imageUrl = URL.createObjectURL(imageBlob);
+        return (
+          <div key={message.id} className={baseClasses}>
+            <img src={imageUrl} alt="Whatsapp Image" className="max-w-full h-auto rounded-lg" />
+          </div>
+        );
+      case 'audio':
+        const audioMessage = message as WhatsappAudio;
+        const audioBlob = new Blob([new Uint8Array(audioMessage.message.data)], { type: 'audio/mpeg' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        return (
+          <div key={message.id} className={`${baseClasses} flex items-center`}>
+            <button
+              onClick={() => {
+                const audio = new Audio(audioUrl);
+                if (isPlaying[message.id]) {
+                  audio.pause();
+                } else {
+                  audio.play();
+                }
+                setIsPlaying({ ...isPlaying, [message.id]: !isPlaying[message.id] });
+              }}
+              className="mr-2 p-2 rounded-full bg-gray-300 hover:bg-gray-400 transition-colors"
+              aria-label={isPlaying[message.id] ? "Pause audio" : "Play audio"}
+            >
+              {isPlaying[message.id] ? <Pause size={16} /> : <Play size={16} />}
+            </button>
+            <span>Audio message</span>
+          </div>
+        );
+      case 'video':
+        const videoMessage = message as WhatsappVideo;
+        const videoBlob = new Blob([new Uint8Array(videoMessage.message.data)], { type: 'video/mp4' });
+        const videoUrl = URL.createObjectURL(videoBlob);
+        return (
+          <div key={message.id} className={baseClasses}>
+            <video controls className="max-w-full h-auto rounded-lg">
+              <source src={videoUrl} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        );
+      case 'document':
+        const docMessage = message as WhatsappDoc;
+        const docBlob = new Blob([new Uint8Array(docMessage.message.data)], { type: 'application/octet-stream' });
+        const docUrl = URL.createObjectURL(docBlob);
+        return (
+          <div key={message.id} className={`${baseClasses} flex items-center`}>
+            <File className="mr-2" size={24} />
+            <a href={docUrl} download="document" className="underline">
+              Download document
+            </a>
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  if (error) {
+    return <div className="text-red-500 text-center p-4">Error: {error}</div>;
   }
 
   return (
     <div className="flex flex-col h-full p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">{data.name}</h2>
-      <div className="flex-1 overflow-y-auto mb-4">
+      <h2 className="text-2xl font-bold mb-4">{data?.name || 'Chat'}</h2>
+      <div className="flex-1 overflow-y-auto mb-4" ref={chatContainerRef}>
         {loading ? (
           <div className="flex justify-center items-center h-full">
-            <div className="spinner border-t-4 border-gray-300 border-solid rounded-full w-8 h-8 animate-spin"></div>
+            <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
           </div>
         ) : (
-          <>
-            <div className="messages-container space-y-4">
-              {data!.WhatsappMessage && data!.WhatsappMessage.length > 0 ? (
-                data!.WhatsappMessage.map((message: WhatsappMessage) => (
-                  <div
-                    key={message.id}
-                    className={`message p-4 rounded-lg shadow-sm max-w-[30%] ${
-                      message.direction === 'outgoing' ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'
-                    }`}
-                  >
-                    <p>{message.message}</p>
-                  </div>
-                ))
-              ) : (
-                <p>No messages available.</p>
-              )}
-              {/* Renderizar los mensajes enviados desde ChatInput */}
-              {messages.map((msg, index) => (
-                <div key={index} className="message p-4 rounded-lg shadow-sm max-w-[30%] bg-blue-500 text-white self-end">
-                  <p>{msg}</p>
-                </div>
-              ))}
-            </div>
-            <div className="images-container space-y-4 mt-4">
-              {data!.WhatsappImage && data!.WhatsappImage.length > 0 ? (
-                data!.WhatsappImage.map((image: WhatsappImage) => {
-                  const blob = new Blob([new Uint8Array(image.message.data)], { type: 'image/jpeg' });
-                  const url = URL.createObjectURL(blob);
-                  return (
-                    <div
-                      key={image.id}
-                      className={`message p-4 rounded-lg shadow-sm max-w-[30%] ${
-                        image.direction === 'outgoing' ? 'bg-gray-100 self-start' : 'bg-gray-300 self-end'
-                      }`}
-                    >
-                      <img src={url} alt="Whatsapp Image" className="max-w-full h-auto rounded-lg" />
-                    </div>
-                  );
-                })
-              ) : (
-                <p></p>
-              )}
-            </div>
-          </>
+          <div className="space-y-4">
+            {data?.WhatsappMessage?.map(renderMessage)}
+            {data?.WhatsappImage?.map(renderMessage)}
+            {data?.WhatsappAudio?.map(renderMessage)}
+            {data?.WhatsappVideo?.map(renderMessage)}
+            {data?.WhatsappDoc?.map(renderMessage)}
+            {messages.map((msg, index) => (
+              <div key={`local-${index}`} className="p-4 rounded-lg shadow-sm max-w-[70%] bg-blue-500 text-white self-end">
+                <p>{msg}</p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
-      <div>
-        <ChatInput onSendMessage={handleSendMessage} id={data!.phone} />
+      <div className="mt-4">
+        <ChatInput onSendMessage={handleSendMessage} id={data?.phone || ''} />
       </div>
     </div>
   );

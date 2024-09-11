@@ -50,7 +50,7 @@ export interface WhatsappImage {
 
 export interface WhatsappAudio {
   id: number,
-  message: string,//archivo de base64
+  message: WhatsappAudioData,//archivo de base64
   to:string,
   status: string,
   direction: string,
@@ -61,7 +61,7 @@ export interface WhatsappAudio {
 
 export interface WhatsappVideo {
   id: number,
-  message: string,//archivo de base64
+  message: WhatsappVideoData,//archivo de base64
   to:string,
   status: string,
   direction: string,
@@ -72,7 +72,7 @@ export interface WhatsappVideo {
 
 export interface WhatsappDoc {
   id: number,
-  message: string,
+  message: WhatsappDocData,
   to:string,
   status: string,
   direction: string,
@@ -82,6 +82,18 @@ export interface WhatsappDoc {
 }
 
  interface WhatsappImageData {
+    type: string;
+    data: ArrayBufferLike;
+  };
+  interface WhatsappVideoData {
+    type: string;
+    data: ArrayBufferLike;
+  };
+  interface WhatsappAudioData {
+    type: string;
+    data: ArrayBufferLike;
+  };
+  interface WhatsappDocData {
     type: string;
     data: ArrayBufferLike;
   };

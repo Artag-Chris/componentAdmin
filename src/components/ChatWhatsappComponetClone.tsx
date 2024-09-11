@@ -197,6 +197,7 @@ export default function EnhancedWhatsAppChat() {
           </div>
         ))}
       </div>
+      {/*  aca comienza la barra para enviar mensajes*/}
       <div className="bg-white border-t border-gray-200 p-4">
         <div className="flex items-center space-x-2">
           <input
