@@ -7,7 +7,7 @@ interface ChatComponentProps {
   user: User | null;
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
+const ChatWhatsappComponent: React.FC<ChatComponentProps> = ({ user }) => {
   const [messages, setMessages] = useState<string[]>([]);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const { data, loading, error } = useSpecificData(user?.phone);
@@ -34,13 +34,13 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
     }
   }, [user]);
 
-  if (!user) {
+  if (!data) {
     return null; // No renderizar nada si no hay un usuario seleccionado
   }
 
   return (
     <div className="flex flex-col h-full p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">{user.name}</h2>
+      <h2 className="text-2xl font-bold mb-4">{data.name}</h2>
       <div className="flex-1 overflow-y-auto mb-4">
         {loading ? (
           <div className="flex justify-center items-center h-full">
@@ -100,4 +100,4 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ user }) => {
   );
 };
 
-export default ChatComponent;
+export default ChatWhatsappComponent;

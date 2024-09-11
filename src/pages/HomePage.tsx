@@ -1,9 +1,9 @@
 import { useState } from "react";
-//import WhatsappMessagesComponent from "../components/WhatsappMessagesComponent";
 import { User } from "../components/interfaces";
 import useWhatsappData from "../components/hook/useWhatsappData";
-import ChatWhatsappComponetClone from "../components/ChatWhatsappComponetClone";
+//import ChatWhatsappComponetClone from "../components/ChatWhatsappComponetClone";
 import WhatsappMessagesComponent from "../components/WhatsappMessagesComponent";
+import ChatWhatsappComponent from "../components/ChatWhatsappComponent";
 
 const HomePage = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -34,8 +34,8 @@ const HomePage = () => {
         } md:block`}
       >
         <h1 className="text-2xl font-bold">Chat</h1>
-        { /*selectedUser && <ChatWhatsappComponentClone user={selectedUser} /> */}
-        <ChatWhatsappComponetClone />
+        { selectedUser && <ChatWhatsappComponent user={selectedUser} /> }
+       {/* <ChatWhatsappComponetClone /> */}
       </div>
     </div>
   );
