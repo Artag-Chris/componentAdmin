@@ -53,22 +53,22 @@ const ChatWhatsappComponent: React.FC<ChatComponentProps> = ({ user }) => {
         const audioUrl = URL.createObjectURL(audioBlob);
         return (
           <div key={message.id} className={`${baseClasses} flex items-center`}>
-            <button
+           { /*<button
               onClick={() => {
                 const audio = new Audio(audioUrl);
-                if (isPlaying[message.id]) {
+                if (isPlaying[message.id!]) {
                   audio.pause();
                 } else {
                   audio.play();
                 }
-                setIsPlaying({ ...isPlaying, [message.id]: !isPlaying[message.id] });
+                setIsPlaying({ ...isPlaying, [message.id!]: !isPlaying[message.id!] });
               }}
               className="mr-2 p-2 rounded-full bg-gray-300 hover:bg-gray-400 transition-colors"
-              aria-label={isPlaying[message.id] ? "Pause audio" : "Play audio"}
+              aria-label={isPlaying[message.id!] ? "Pause audio" : "Play audio"}
             >
-              {isPlaying[message.id] ? <Pause size={16} /> : <Play size={16} />}
+              {isPlaying[message.id!] ? <Pause size={16} /> : <Play size={16} />}
             </button>
-            <span>Audio message</span>
+            <span>Audio message</span> */}
           </div>
         );
       case 'video':

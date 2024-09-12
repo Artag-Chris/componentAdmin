@@ -18,7 +18,7 @@ export interface User {
     // Agrega más campos según sea necesario
   }
 
-  enum WhatsappStatus {
+   export enum WhatsappStatus {
     "initial",
     "onMainMenu",
     "selectingState",
@@ -27,7 +27,7 @@ export interface User {
   }
 
 export interface WhatsappMessage {
-  id: number,
+  id: string,
   message: string,
   to:string,
   status: string,
