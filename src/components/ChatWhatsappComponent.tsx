@@ -14,6 +14,9 @@ const ChatWhatsappComponent: React.FC<ChatComponentProps> = ({ user }) => {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState<{ [key: number]: boolean }>({});
 
+  const userData = data.user;
+  const botData = data.botMessages;
+
   const handleSendMessage = (newMessage: string) => {
     if (newMessage.trim() === '') return;
     setMessages([...messages, newMessage]);
@@ -105,7 +108,15 @@ const ChatWhatsappComponent: React.FC<ChatComponentProps> = ({ user }) => {
   }
 
   return (
-    <div className="flex flex-col h-full p-4 bg-white rounded-lg shadow-md">
+    <h1>{ userData?.name || 'Chat'}</h1>
+  );
+};
+
+export default ChatWhatsappComponent;
+
+
+/*
+<div className="flex flex-col h-full p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4">{data?.name || 'Chat'}</h2>
       <div className="flex-1 overflow-y-auto mb-4" ref={chatContainerRef}>
         {loading ? (
@@ -130,8 +141,4 @@ const ChatWhatsappComponent: React.FC<ChatComponentProps> = ({ user }) => {
       <div className="mt-4">
         <ChatInput onSendMessage={handleSendMessage} id={data?.phone || ''} />
       </div>
-    </div>
-  );
-};
-
-export default ChatWhatsappComponent;
+    </div>*/
