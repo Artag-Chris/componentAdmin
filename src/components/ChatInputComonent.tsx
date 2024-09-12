@@ -62,7 +62,6 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, id }) => {
         },
         body: JSON.stringify(user),
       });  
-      console.log(responseToSave)
   
       // Call the onSendMessage function to pass the message to the parent component
       onSendMessage(inputText);

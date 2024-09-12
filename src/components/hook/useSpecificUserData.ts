@@ -9,15 +9,19 @@ interface SpecificData {
   whatsappAudio?:WhatsappAudio,
   whatsappDoc?:WhatsappDoc 
 }
+interface CombinedData {
+  user: User | null;
+  botMessages: User | null;
+}
 
 const useSpecificData = (id?: string | null) => {
-  const [data, setData] = useState<User| null>(null);
+  const [data, setData] = useState<CombinedData>({ user: null, botMessages: null });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     if (id === null) {
-      setData(null);
+      setData({ user: null, botMessages: null });
       setLoading(false);
       setError(null);
       return;
@@ -27,9 +31,14 @@ const useSpecificData = (id?: string | null) => {
     setError(null);
 
     try {
-      const response = await axios.get<User>(`http://localhost:4000/api/prisma/deepSearchForAllMessages/${id}`);
-     // console.log(response.data)
-      setData(response.data);
+      const responses = await Promise.all([
+        axios.get<User>(`http://localhost:4000/api/prisma/deepSearchForAllMessages/${id}`),
+        axios.get<User>(`http://localhost:4000/api/prisma/searchForBotMessages/${id}`),
+      ]);
+      setData({
+        user: responses[0].data,
+        botMessages: responses[1].data,
+      });
     } catch (err:any) {
       setError(err.message);
     } finally {
