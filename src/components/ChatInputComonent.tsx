@@ -41,27 +41,26 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage, id }) => {
     setUser(enviar)
     // Send the first POST request to send the text message
     try {
-      const response = await fetch('http://localhost:4000/api/whatsapp/sendTextResponse', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: inputText, id }),
-      });
-      if (!response.ok) {
-        throw new Error(`Error sending message: ${response.status} ${response.statusText}`);
+      const [response, responseToSave] = await Promise.all([
+        fetch('http://localhost:4000/api/whatsapp/sendTextResponse', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: inputText, id }),
+        }),
+        fetch('http://localhost:4000/api/prisma/frontmessage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(user),
+        }),
+      ])
+  
+      if (!response.ok || !responseToSave.ok) {
+        throw new Error(`Error sending message: ${response.status} ${response.statusText} o ${responseToSave.status} ${responseToSave.statusText}`);
       }
-  
-
-   
-  
-     const responseToSave = await fetch('http://localhost:4000/api/prisma/frontmessage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(user),
-      });  
   
       // Call the onSendMessage function to pass the message to the parent component
       onSendMessage(inputText);

@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import { FetchDatafromAPIClass } from '../interfaces/fetchUsersData';
 
-const useWhatsappData = () => {
+export const useWhatsappData = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [forceRefresh, setForceRefresh] = useState<boolean>(false);
+
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -15,9 +17,11 @@ const useWhatsappData = () => {
       setLoading(false);
     } else {
       try {
-        const response = await axios.get<any[]>('http://localhost:4000/api/prisma/users');
-        setData(response.data);
-        localStorage.setItem('whatsappData', JSON.stringify(response.data));
+        const response = await axios.get<FetchDatafromAPIClass[]>('http://localhost:4000/api/prisma/users');
+        const uniqueData = Array.from(new Set(response.data.map(item => item.phone)));
+      
+        setData((prevData) => [...prevData, ...uniqueData]);
+        localStorage.setItem('whatsappData', JSON.stringify([...(JSON.parse(storedData!) || []), ...response.data]));
         setLoading(false);
       } catch (err) {
         setError('Error fetching data');
@@ -38,5 +42,3 @@ const useWhatsappData = () => {
 
   return { data, loading, error, setData, refreshData };
 };
-
-export default useWhatsappData;
