@@ -52,9 +52,9 @@ const VideoMessage: React.FC<{
 
 const VoiceMessage: React.FC<{
   src: string;
-  duration: number;
+  
   direction: "outgoing" | "incoming";
-}> = ({ src, duration, direction }) => {
+}> = ({ src, direction }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -92,27 +92,22 @@ const VoiceMessage: React.FC<{
           style={{ width: `${isPlaying ? 50 : 0}%` }}
         ></div>
       </div>
-      <span className="text-sm text-gray-500">{duration}s</span>
       <audio ref={audioRef} src={src} onEnded={handleEnded} />
     </div>
   );
 };
 
 const DocumentMessage: React.FC<{
-  fileName: string;
-  fileSize: string;
+
   direction: "outgoing" | "incoming";
-}> = ({ fileName, fileSize, direction }) => (
+}> = ({  direction }) => (
   <div
     className={`flex items-center space-x-2 ${
       direction === "outgoing" ? "justify-end" : "justify-start"
     }`}
   >
     <File size={24} />
-    <div>
-      <p className="text-sm font-medium">{fileName}</p>
-      <p className="text-xs text-gray-500">{fileSize}</p>
-    </div>
+   
   </div>
 );
 
@@ -163,7 +158,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   const handleSendMessage = () => {
     if (inputText.trim()) {
       const newMessage: ChatMessages = {
-        id: (messages?.length + 1).toString(),
+        id: `${(messages?.length + 1).toString()}`,
         type: "text",
         message: inputText,
         timestamp: new Date(),
@@ -188,14 +183,18 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string;
-        const newMessage: MergedMessagesToChats = {
-          id: messages.length + 1,
+        const newMessage: ChatMessages = {
+          id: `${(messages?.length + 1).toString()}`,
           type,
-          content,
-          timestamp: new Date().toISOString(),
-          direction: "incoming",
-          fileName: file.name,
-          fileSize: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+          message: content, //aqui tiene que convertirse en un base64 
+          timestamp: new Date(),
+          direction: "outgoing",
+          to: specificData.phone,
+          customerId: specificData.id,
+          attendant: specificData.attending,
+          status: "delivered",
+          mediaId: "",
+         
         };
         setMessages([...messages, newMessage]);
       };
@@ -207,12 +206,17 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     if (isRecording) {
       // Stop recording and send voice message
       const newMessage: ChatMessages = {
-        id: messages.length + 1,
+        id: `${(messages?.length + 1).toString()}`,
         type: "audio",
-        content: "https://example.com/recorded-audio.mp3", // This would be the actual recorded audio URL
-        timestamp: new Date().toISOString(),
+        message: "https://example.com/recorded-audio.mp3", // This would be the actual recorded audio URL
+        timestamp: new Date(),
         direction: "incoming",
-        duration: recordingTime,
+        to: specificData.phone,
+        customerId: specificData.id,
+        attendant: specificData.attending,
+        status: "delivered",
+        mediaId: "",
+        
       };
       setMessages([...messages, newMessage]);
       setIsRecording(false);
@@ -248,15 +252,13 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                   : "bg-white text-gray-800 border border-gray-200"
               }`}
             >
-              {message.type === "text" && (
-                <p className="text-sm">{message.message}</p>
-              )}
-
-              <p
-                className={`text-xs mt-1 ${
-                  message.direction === "outgoing" ? "text-green-100" : "text-gray-500"
-                }`}
-              >
+              {message.type === "text" && (<p className="text-sm">{message.message}</p>)}
+              {message.type === 'image' && <ImageMessage src={message.message} direction={message.direction} />}
+              {message.type === 'video' && <VideoMessage src={message.message} direction={message.direction} />}
+              {message.type === 'audio' && <VoiceMessage src={message.message} direction={message.direction} />}
+              {message.type === 'document' && <DocumentMessage  direction={message.direction} />}
+              <p className={`text-xs mt-1 ${message.direction === "outgoing" ? "text-green-100" : "text-gray-500"
+                }`} >
                 {format(new Date(message.timestamp), "HH:mm")}
               </p>
             </div>
