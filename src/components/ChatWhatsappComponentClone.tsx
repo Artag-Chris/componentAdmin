@@ -12,6 +12,7 @@ import {
 import useSpecificData from "./hook/useSpecificUserData";
 import { Conversation } from "./class/Conversation";
 import { format } from "date-fns/format";
+import { ChatMessages } from "./interfaces/mergedDataMessages";
 
 //import { MergedMessagesToChats } from './interfaces/mergedDataMessages';
 
@@ -161,12 +162,17 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
 
   const handleSendMessage = () => {
     if (inputText.trim()) {
-      const newMessage: MergedMessagesToChats = {
-        id: messages?.length + 1,
+      const newMessage: ChatMessages = {
+        id: (messages?.length + 1).toString(),
         type: "text",
-        content: inputText,
-        timestamp: new Date().toISOString(),
+        message: inputText,
+        timestamp: new Date(),
         direction: "outgoing",
+        to: specificData.phone,
+        customerId: specificData.id,
+        attendant: specificData.attending,
+        status: "delivered",
+        mediaId: "",
       };
       setMessages([...messages, newMessage]);
       setInputText("");
@@ -200,7 +206,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   const handleVoiceRecording = () => {
     if (isRecording) {
       // Stop recording and send voice message
-      const newMessage: MergedMessagesToChats = {
+      const newMessage: ChatMessages = {
         id: messages.length + 1,
         type: "audio",
         content: "https://example.com/recorded-audio.mp3", // This would be the actual recorded audio URL
@@ -224,7 +230,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       </div>
     );
   }
-  console.log(JSON.stringify(messages));
+ // console.log(JSON.stringify(messages));
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
