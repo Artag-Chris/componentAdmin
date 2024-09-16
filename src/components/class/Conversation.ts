@@ -48,13 +48,17 @@ export class Conversation {
         this.WhatsappDoc = WhatsappDoc;
     }
 
-    mergeArrays() {
-        return [
-            ...this.WhatsappMessage!,
-            ...this.WhatsappImage!,
-            ...this.WhatsappAudio!,
-            ...this.WhatsappVideo!,
-            ...this.WhatsappDoc!,
+    mergeArrays(): (WhatsappMessage | WhatsappImage | WhatsappAudio | WhatsappVideo | WhatsappDoc)[] {
+        const mergedArray = [
+            ...new Set([
+                ...(this.WhatsappMessage || []),
+                ...(this.WhatsappImage || []),
+                ...(this.WhatsappAudio || []),
+                ...(this.WhatsappVideo || []),
+                ...(this.WhatsappDoc || []),
+            ])
         ];
+    
+        return mergedArray;
     }
 }

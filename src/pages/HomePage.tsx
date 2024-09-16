@@ -14,8 +14,6 @@ const HomePage = () => {
         setSelectedUser(user);
     };
 
- 
-
     return (
         <div className="flex flex-col md:flex-row h-screen bg-white text-black">
             <div className="w-full md:w-3/12 p-4 bg-gray-100 rounded-lg">
@@ -28,7 +26,7 @@ const HomePage = () => {
             <div className={`w-full md:w-9/12 p-4 bg-gray-200 rounded-lg ${selectedUser ? "block" : "hidden"} md:block`}>
                 <h1 className="text-2xl font-bold">Chat</h1>
                 { /*selectedUser && <ChatWhatsappComponent user={selectedUser} /> */}
-                {selectedUser && <ChatWhatsappComponentClone user={selectedUser} /> }
+                { selectedUser && <ChatWhatsappComponentClone user={selectedUser} /> }
             </div>
         </div>
     );

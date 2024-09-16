@@ -4,8 +4,8 @@ import {
   Mic,
   Play,
   Pause,
-  Image,
-  Video,
+ // Image,
+ // Video,
   Paperclip,
   Send,
 } from "lucide-react";
@@ -15,24 +15,33 @@ import { format } from "date-fns/format";
 import { ChatMessages } from "./interfaces/mergedDataMessages";
 import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 
-//import { MergedMessagesToChats } from './interfaces/mergedDataMessages';
+
 
 interface Props {
   user: any; // Define el tipo de usuario que se espera
 }
 
 const ImageMessage: React.FC<{
-  src: string;
+  src: {
+    message: { data: ArrayBufferLike};
+    type: string;
+  };
   direction: "outgoing" | "incoming";
-}> = ({ src, direction }) => (
-  <img
-    src={src}
-    alt="Shared image"
-    className={`max-w-xs lg:max-w-sm rounded-lg ${
-      direction === "outgoing" ? "ml-auto" : "mr-auto"
-    }`}
-  />
-);
+}> = ({ src, direction }) => {
+  const url = URL.createObjectURL(
+    new Blob([new Uint8Array(src.message.data)], { type: 'image/jpeg' })
+  );
+  return (
+    <img
+      src={url}
+      alt="Shared image"
+      className={`max-w-xs lg:max-w-sm rounded-lg ${
+        direction === "outgoing" ? "ml-auto" : "mr-auto"
+      }`}
+    />
+  );
+
+};
 
 const VideoMessage: React.FC<{
   src: string;
@@ -279,13 +288,13 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       </div>
     );
   }
-  // console.log(JSON.stringify(messages));
+  
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.map((message) => (
           <div
-            key={message.id}
+            key={message.length}
             className={`flex ${
               message.direction === "outgoing" ? "justify-end" : "justify-start"
             }`}
@@ -302,7 +311,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
               )}
               {message.type === "image" && (
                 <ImageMessage
-                  src={message.message}
+                  src={message}
                   direction={message.direction}
                 />
               )}
