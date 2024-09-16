@@ -44,25 +44,39 @@ const ImageMessage: React.FC<{
 };
 
 const VideoMessage: React.FC<{
-  src: string;
-  direction: "outgoing" | "incoming";
-}> = ({ src, direction }) => (
-  <video
-    controls
-    className={`max-w-xs lg:max-w-sm rounded-lg ${
-      direction === "outgoing" ? "ml-auto" : "mr-auto"
-    }`}
-  >
-    <source src={src} type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
-);
-
-const VoiceMessage: React.FC<{
-  src: string;
-
+  src: {
+    message: { data: ArrayBufferLike };
+    type: string;
+  };
   direction: "outgoing" | "incoming";
 }> = ({ src, direction }) => {
+  const url = URL.createObjectURL(
+    new Blob([new Uint8Array(src.message.data)], { type: 'video/mp4' })
+  );
+  return (
+    <video
+      controls
+      className={`max-w-32 lg:max-w-48 rounded-lg${
+        direction === "outgoing" ? "ml-auto" : "mr-auto"
+      }`}
+    >
+      <source src={url} type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+  );
+};
+
+const VoiceMessage: React.FC<{
+  src: {
+    message: { data: ArrayBufferLike };
+    type: string;
+  };
+  direction: "outgoing" | "incoming";
+}> = ({ src, direction }) => {
+  const url = URL.createObjectURL(
+    new Blob([new Uint8Array(src.message.data)], { type: 'audio/ogg' })
+  );
+
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -100,7 +114,7 @@ const VoiceMessage: React.FC<{
           style={{ width: `${isPlaying ? 50 : 0}%` }}
         ></div>
       </div>
-      <audio ref={audioRef} src={src} onEnded={handleEnded} />
+      <audio ref={audioRef} src={url} onEnded={handleEnded} />
     </div>
   );
 };
@@ -372,13 +386,13 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
               )}
               {message.type === "video" && (
                 <VideoMessage
-                  src={message.message}
+                  src={message}
                   direction={message.direction}
                 />
               )}
               {message.type === "audio" && (
                 <VoiceMessage
-                  src={message.message}
+                  src={message}
                   direction={message.direction}
                 />
               )}
