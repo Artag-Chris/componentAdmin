@@ -14,6 +14,7 @@ import { Conversation } from "./class/Conversation";
 import { format } from "date-fns/format";
 import { ChatMessages } from "./interfaces/mergedDataMessages";
 import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
+import { LoadingComponent } from "./LoadingComponente";
 
 
 
@@ -35,12 +36,11 @@ const ImageMessage: React.FC<{
     <img
       src={url}
       alt="Shared image"
-      className={`max-w-xs lg:max-w-sm rounded-lg ${
+      className={`max-w-32 lg:max-w-48 rounded-lg ${
         direction === "outgoing" ? "ml-auto" : "mr-auto"
       }`}
     />
   );
-
 };
 
 const VideoMessage: React.FC<{
@@ -117,6 +117,7 @@ const DocumentMessage: React.FC<{
   </div>
 );
 
+
 export default function EnhancedWhatsAppChat({ user }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +125,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { specificData } = useSpecificData(user?.phone);
+  const { specificData,refreshData } = useSpecificData(user?.phone);
   const [envio, setenvio] = useState<User | null>(null);
   const conversation = new Conversation(
     specificData.id,
@@ -146,11 +147,24 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   useEffect(() => {
     const loadMessages = async () => {
       //const fetchedMessages = await fetchMessages()
-      setMessages(conversation.mergeArrays());
+      const sortedMessages = conversation.mergeArrays().sort((a, b) => {
+        const timestampA = (a as WhatsappMessage).timestamp;
+        const timestampB = (b as WhatsappMessage).timestamp;
+      
+        if (!timestampA || !timestampB) {
+          // You can decide how to handle this case, e.g., return 0 to keep the original order
+          return 0;
+        }
+      
+        return new Date(timestampA).getTime() - new Date(timestampB).getTime();
+      });
+      setMessages(sortedMessages);
       setLoading(false);
     };
     loadMessages();
   }, [specificData]);
+
+  
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -161,6 +175,48 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     }
     return () => clearInterval(interval);
   }, [isRecording]);
+
+  const handleNewMessage = (message: any) => {
+    console.log('Nuevo mensaje recibido:', message);
+    refreshData();
+  };
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:4000/ws");
+
+    ws.onopen = () => {
+      console.log("Conectado al servidor WebSocket");
+    };
+
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      handleNewMessage(message);
+    };
+    ws.onclose = () => {
+      console.log("Desconectado del servidor WebSocket");
+      reconnectWebSocket();
+    };
+
+    ws.onerror = (error) => {
+      console.error("Error en el WebSocket:", error);
+    };
+    const reconnectWebSocket = () => {
+      setTimeout(() => {
+        const ws = new WebSocket("ws://localhost:4000/ws");
+        // Aquí puedes volver a establecer los eventos ws.onopen, ws.onmessage, etc.
+        ws.onopen = () => {
+          console.log("Reconectado al servidor WebSocket");
+        };
+        // ...
+      }, 5000); // Intenta reconectar después de 5 segundos
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
+
+  
 
   const handleSendMessage = async() => {
     if (inputText.trim()) {
@@ -280,11 +336,10 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       setIsRecording(true);
     }
   };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full">
-        Loading messages...
+        <LoadingComponent />
       </div>
     );
   }

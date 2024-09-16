@@ -62,7 +62,19 @@ const useSpecificData = (id?: string | null) => {
     fetchData();
   }, [id, fetchData]);
 
-  return { specificData, loading, error,setLoading };
+  const refreshData = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      fetchData();
+    }, 10000);
+
+    return () => clearInterval(intervalId);
+  }, [fetchData]);
+
+  return { specificData, loading, error,setLoading,refreshData };
 };
 
 export default useSpecificData;

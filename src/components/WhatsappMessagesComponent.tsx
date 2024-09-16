@@ -4,6 +4,7 @@ import { useWhatsappData } from "./hook/useWhatsappData";
 import { User } from "./interfaces";
 import { numberParser } from "./functions/numberParser";
 import { MessageCircle } from "lucide-react";
+import { LoadingComponent } from "./LoadingComponente";
 
 
 interface WhatsappMessagesComponentProps {
@@ -14,15 +15,9 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
   onSelectUser,
 }) => {
   const { data, loading, error, refreshData } = useWhatsappData();
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-
- 
-  
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null); 
   const [messages, setMessages] = useState([]);
 
-
-  
     const handleClick = (item: User) => {
     {
       /*if (socket && socket.readyState === WebSocket.OPEN) {
@@ -46,35 +41,10 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
     };
   }, [refreshData]);
 
-  useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4000/ws");
-
-    ws.onopen = () => {
-      console.log("Conectado al servidor WebSocket");
-    };
-
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      //setMessages(prevMessages => [...prevMessages, message]);
-      // Aquí puedes manejar los mensajes entrantes y enviarlos al componente Chat
-      console.log(message);
-    };
-
-    ws.onclose = () => {
-      console.log("Desconectado del servidor WebSocket");
-    };
-
-    ws.onerror = (error) => {
-      console.error("Error en el WebSocket:", error);
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, []);
+  
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div><LoadingComponent /> </div>;
   }
 
   if (error) {

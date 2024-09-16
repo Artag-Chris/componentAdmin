@@ -35,6 +35,7 @@ export interface WhatsappMessage {
   type: string,
   mediaId: "",
   attendant: number,
+  timestamp?: Date
 }
 
 export interface WhatsappImage {
