@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { File, Mic, Paperclip, Send } from "lucide-react";
+import { Mic, Paperclip, Send } from "lucide-react";
 import useSpecificData from "./hook/useSpecificUserData";
 import { Conversation } from "./class/Conversation";
 import { format } from "date-fns/format";
@@ -8,126 +8,11 @@ import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { LoadingComponent } from "./LoadingComponente";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 import { base64ToBlob } from "./functions";
-
+import {ImageMessage , VideoMessage, VoiceMessage, DocumentMessage} from "./chatcomponents";
 interface Props {
   user: any; // Define el tipo de usuario que se espera
 }
 
-const ImageMessage: React.FC<{
-  src: {
-    message: { data: ArrayBufferLike };
-    type: string;
-  };
-  direction: "outgoing" | "incoming";
-}> = ({ src, direction }) => {
-  const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], { type: "image/jpeg" })
-  );
-  return (
-    <img
-      src={url}
-      alt="Shared image"
-      className={`max-w-32 lg:max-w-48 rounded-lg ${
-        direction === "outgoing" ? "ml-auto" : "mr-auto"
-      }`}
-    />
-  );
-};
-
-const VideoMessage: React.FC<{
-  src: {
-    message: { data: ArrayBufferLike };
-    type: string;
-  };
-  direction: "outgoing" | "incoming";
-}> = ({ src, direction }) => {
-  const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], { type: "video/mp4" })
-  );
-  return (
-    <video
-      controls
-      className={`max-w-32 lg:max-w-48 rounded-lg${
-        direction === "outgoing" ? "ml-auto" : "mr-auto"
-      }`}
-    >
-      <source src={url} type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-  );
-};
-
-const VoiceMessage: React.FC<{
-  src: {
-    message: { data: ArrayBufferLike };
-    type: string;
-  };
-  direction: "outgoing" | "incoming";
-}> = ({ src, direction }) => {
-  const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], { type: "audio/mpeg" })
-  );
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.addEventListener("ended", handleEnded);
-    }
-  }, [audioRef]);
-
-  const togglePlay = () => {
-    if (isPlaying) {
-      audioRef.current?.pause();
-    } else {
-      audioRef.current?.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
-
-  const handleEnded = () => {
-    setIsPlaying(false);
-  };
-
-  return (
-    <div
-      className={`flex items-center space-x-2 ${
-        direction === "outgoing" ? "justify-end" : "justify-start"
-      }`}
-    >
-      <audio src={url} controls preload="auto">
-        <source src={url} type="audio/mpeg" />
-        Tu navegador no soporta el audio.
-      </audio>
-    </div>
-  );
-};
-const DocumentMessage: React.FC<{
-  src: {
-    message: { data: ArrayBufferLike };
-    type: string;
-  };
-  direction: "outgoing" | "incoming";
-}> = ({ src, direction }) => {
-  const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], {
-      type: "application/octet-stream",
-    })
-  );
-  return (
-    <a
-      href={url}
-      download="documento"
-      className={`flex items-center text-blue-500 hover:underline ${
-        direction === "outgoing" ? "ml-auto" : "mr-auto"
-      }`}
-    >
-      <File size={24} className="mr-2" />
-      Ver documento
-    </a>
-  );
-};
 
 export default function EnhancedWhatsAppChat({ user }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
