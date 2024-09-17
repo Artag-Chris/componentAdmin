@@ -70,10 +70,6 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     return () => clearInterval(interval);
   }, [isRecording]);
 
-  const handleNewMessage = (message: any) => {
-    console.log("Nuevo mensaje recibido:", message);
-    refreshData();
-  };
 
   useEffect(() => {
     const ws = new WebSocket("ws://localhost:4000/ws");
@@ -83,7 +79,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
 
     ws.onmessage = (event) => {
-      // const message = JSON.parse(event.data);
+       //const message = JSON.parse(event.data);
       //  handleNewMessage(message);
     };
     ws.onclose = () => {
@@ -151,8 +147,6 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       WhatsappMessage: array,
       detail: "",
     };
-    //console.log(envio);
-    // Send the first POST request to send the text message
     setenvio(enviar);
     try {
       const [response, responseToSave] = await Promise.all([
@@ -194,7 +188,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       reader.onload = (e) => {
         const content = e.target?.result as string; //
         const blob = base64ToBlob(content);
-        const fileUrl = URL.createObjectURL(blob);
+       
         const messagingProduct = "whatsapp";
         const base64StringWithoutPrefix = removeBase64Prefix(content);
         //const fileUrl = URL.createObjectURL(urlMedia!);
@@ -230,26 +224,6 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           attendant: specificData.attending,
           status: "delivered",
           mediaId: "",
-        };
-
-        const documentTypes = {
-          "text/plain": "Texto",
-          "application/vnd.ms-excel": "Microsoft Excel",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-            "Microsoft Excel",
-          "application/msword": "Microsoft Word",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-            "Microsoft Word",
-          "application/vnd.ms-powerpoint": "Microsoft PowerPoint",
-          "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-            "Microsoft PowerPoint",
-          "application/pdf": "PDF",
-          "image/jpeg": "Imagen",
-          "image/png": "Imagen",
-          "image/gif": "Imagen",
-          "video/mp4": "Video",
-          "video/quicktime": "Video",
-          "video/mpeg": "Video",
         };
 
         switch (newMessage.type) {
