@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  File,
-  Mic,
-  Play,
-  Pause,
-  // Image,
-  // Video,
-  Paperclip,
-  Send,
-  Phone,
-} from "lucide-react";
+import { File, Mic, Paperclip, Send } from "lucide-react";
 import useSpecificData from "./hook/useSpecificUserData";
 import { Conversation } from "./class/Conversation";
 import { format } from "date-fns/format";
@@ -17,6 +7,7 @@ import { ChatMessages } from "./interfaces/mergedDataMessages";
 import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { LoadingComponent } from "./LoadingComponente";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
+import { base64ToBlob } from "./functions";
 
 interface Props {
   user: any; // Define el tipo de usuario que se espera
@@ -120,7 +111,9 @@ const DocumentMessage: React.FC<{
   direction: "outgoing" | "incoming";
 }> = ({ src, direction }) => {
   const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], { type: "application/octet-stream" })
+    new Blob([new Uint8Array(src.message.data)], {
+      type: "application/octet-stream",
+    })
   );
   return (
     <a
@@ -205,8 +198,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
 
     ws.onmessage = (event) => {
-     // const message = JSON.parse(event.data);
-    //  handleNewMessage(message);
+      // const message = JSON.parse(event.data);
+      //  handleNewMessage(message);
     };
     ws.onclose = () => {
       console.log("Desconectado del servidor WebSocket");
@@ -262,16 +255,16 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
         attendant: 0,
       },
     ];
-    
+
     const enviar: User = {
-      "name": "Bot",
-      "phone": "573025970185",
-      "identification": "573025970185",
-      "atending": 0,
-      "lastActive": new Date(),
-      "wppStatus": WhatsappStatus.attended,
-      "WhatsappMessage": array,
-     "detail": "",
+      name: "Bot",
+      phone: "573025970185",
+      identification: "573025970185",
+      atending: 0,
+      lastActive: new Date(),
+      wppStatus: WhatsappStatus.attended,
+      WhatsappMessage: array,
+      detail: "",
     };
     //console.log(envio);
     // Send the first POST request to send the text message
@@ -293,7 +286,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           body: JSON.stringify(envio),
         }),
       ]);
-      
+
       setInputText("");
       if (!response.ok || !responseToSave.ok) {
         throw new Error(
@@ -305,23 +298,30 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     }
   };
 
-  const handleFileUpload = (
+  const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "image" | "video" | "document"
   ) => {
     const file = event.target.files?.[0];
+
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string; //
-        const urlMedia = event.target.files?.[0];
+        const blob = base64ToBlob(content);
+        const fileUrl = URL.createObjectURL(blob);
+        const messagingProduct = "whatsapp";
         const base64StringWithoutPrefix = removeBase64Prefix(content);
-        const fileUrl = URL.createObjectURL(urlMedia!);
-        
+        //const fileUrl = URL.createObjectURL(urlMedia!);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("type", file.type);
+        formData.append("messaging_product", messagingProduct);
+
         const newMessage: ChatMessages = {
           id: `${(messages?.length + 1).toString()}`,
           type: file.type,
-          message: base64StringWithoutPrefix, 
+          message: base64StringWithoutPrefix,
           timestamp: new Date(),
           direction: "outgoing",
           to: specificData.phone,
@@ -332,12 +332,12 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
         };
         const sendToApi: any = {
           id:
-          Math.random().toString(36).substring(2, 15) +
-          Math.random().toString(36).substring(2, 15),
+            Math.random().toString(36).substring(2, 15) +
+            Math.random().toString(36).substring(2, 15),
           name: "Bot",
-          phone: "573025970185",//numero del bot
+          phone: "573025970185", //numero del bot
           type: file.type, //tipo de archivo toca desfragmentarlo para enviarlo a la ap
-          message: base64StringWithoutPrefix, 
+          message: base64StringWithoutPrefix,
           timestamp: new Date(),
           direction: "outgoing",
           to: specificData.phone,
@@ -345,18 +345,19 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           attendant: specificData.attending,
           status: "delivered",
           mediaId: "",
-          
         };
-        
-        
+
         const documentTypes = {
           "text/plain": "Texto",
           "application/vnd.ms-excel": "Microsoft Excel",
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Microsoft Excel",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+            "Microsoft Excel",
           "application/msword": "Microsoft Word",
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Microsoft Word",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            "Microsoft Word",
           "application/vnd.ms-powerpoint": "Microsoft PowerPoint",
-          "application/vnd.openxmlformats-officedocument.presentationml.presentation": "Microsoft PowerPoint",
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+            "Microsoft PowerPoint",
           "application/pdf": "PDF",
           "image/jpeg": "Imagen",
           "image/png": "Imagen",
@@ -365,7 +366,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           "video/quicktime": "Video",
           "video/mpeg": "Video",
         };
-     
+
         switch (newMessage.type) {
           case "text/plain":
           case "application/vnd.ms-excel":
@@ -391,29 +392,36 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                 },
                 body: JSON.stringify(sendToApi),
               })
-              .then((response) => response.json())
-              .then((data) => console.log(data))
-              .catch((error) => console.error(error)),
-              fetch("https://graph.facebook.com/v20.0/368124183059222/media", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": "Bearer EAAMGwDhngcsBO6ZBXVhpIzU1GWOXbZBjwuri24DrWm6MdWDJWyIxPI4gtDMiA1UPjYIreLTgSudAftTjo5PHkNp7l4JgultA4mYim5JtcQHsB0axhNo1WM86aL4A9cNcQ6P5mQRq3P6ZArlmWWGdS1HWM00Y6j3ZCYs8rXv6YetWqwKSDrhlyucKhFmxrhww3S1wfE1Vw4DHkHXff9GDTfuOEtolfGISo3EoMPIZACQZDZD"
-                },
-                body: JSON.stringify({
-                  "messaging_product": "whatsapp",
-                  "recipient_type": "individual",
-                  "to": specificData.phone,
-                  "type": "image/jpeg",
-                  "file": fileUrl, 
-                })
-              })
-              .then((response) => response.json())
-              .then((data) => console.log(data))
-              .catch((error) => console.error(error))
+                // .then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((error) => console.error(error)),
+              fetch(
+                "https://graph.facebook.com/v20.0/368124183059222/media?messaging_product=whatsapp",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization:
+                      "Bearer EAAMGwDhngcsBO8ZB5C0hnmwzRB2AD53h6hPTI9N1xfWJldhFqCJ5xekhhcTLSqrHATRaGQ5eS90O1rZBPftRuUQdPsExZCTmFr66v7qfTqv5D1loiK5xqaDUwN94KSwXi8yZAw0KXxhtvwCdqA0bZAkGZAfzDUX6ZAGqtU0tTFkYlT9lRGJX9e8uuoZB1l72ml9deLvEl85k7Q4onk0LTiZCFTc1xNnhTwPvl4ddA1ZCojawZDZD",
+                    // 'messaging_product': 'whatsapp'
+                  },
+                  body: JSON.stringify({
+                    file: file,
+                    type: file.type,
+                    //messaging_product: 'whatsapp'
+                  }),
+                }
+              )
+                .then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((error) => console.error(error)),
             ])
-            .then(() => console.log("Ambas solicitudes se han completado con éxito"))
-            .catch((error) => console.error("Error al enviar las solicitudes:", error));
+              .then(() =>
+                console.log("Ambas solicitudes se han completado con éxito")
+              )
+              .catch((error) =>
+                console.error("Error al enviar las solicitudes:", error)
+              );
 
             break;
           case "video/mp4":
@@ -426,10 +434,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
             console.log("Tipo de archivo no reconocido");
             break;
         }
-       
-        
-        
-  
+
         setMessages([...messages, newMessage]);
       };
       reader.readAsDataURL(file);
