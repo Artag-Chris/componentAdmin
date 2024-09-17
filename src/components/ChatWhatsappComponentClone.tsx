@@ -4,10 +4,11 @@ import {
   Mic,
   Play,
   Pause,
- // Image,
- // Video,
+  // Image,
+  // Video,
   Paperclip,
   Send,
+  Phone,
 } from "lucide-react";
 import useSpecificData from "./hook/useSpecificUserData";
 import { Conversation } from "./class/Conversation";
@@ -15,8 +16,7 @@ import { format } from "date-fns/format";
 import { ChatMessages } from "./interfaces/mergedDataMessages";
 import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { LoadingComponent } from "./LoadingComponente";
-
-
+import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 
 interface Props {
   user: any; // Define el tipo de usuario que se espera
@@ -24,13 +24,13 @@ interface Props {
 
 const ImageMessage: React.FC<{
   src: {
-    message: { data: ArrayBufferLike};
+    message: { data: ArrayBufferLike };
     type: string;
   };
   direction: "outgoing" | "incoming";
 }> = ({ src, direction }) => {
   const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], { type: 'image/jpeg' })
+    new Blob([new Uint8Array(src.message.data)], { type: "image/jpeg" })
   );
   return (
     <img
@@ -51,7 +51,7 @@ const VideoMessage: React.FC<{
   direction: "outgoing" | "incoming";
 }> = ({ src, direction }) => {
   const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], { type: 'video/mp4' })
+    new Blob([new Uint8Array(src.message.data)], { type: "video/mp4" })
   );
   return (
     <video
@@ -74,21 +74,25 @@ const VoiceMessage: React.FC<{
   direction: "outgoing" | "incoming";
 }> = ({ src, direction }) => {
   const url = URL.createObjectURL(
-    new Blob([new Uint8Array(src.message.data)], { type: 'audio/ogg' })
+    new Blob([new Uint8Array(src.message.data)], { type: "audio/mpeg" })
   );
 
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const togglePlay = () => {
+  useEffect(() => {
     if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
+      audioRef.current.addEventListener("ended", handleEnded);
     }
+  }, [audioRef]);
+
+  const togglePlay = () => {
+    if (isPlaying) {
+      audioRef.current?.pause();
+    } else {
+      audioRef.current?.play();
+    }
+    setIsPlaying(!isPlaying);
   };
 
   const handleEnded = () => {
@@ -101,36 +105,36 @@ const VoiceMessage: React.FC<{
         direction === "outgoing" ? "justify-end" : "justify-start"
       }`}
     >
-      <button
-        onClick={togglePlay}
-        className="p-2 rounded-full bg-green-500 text-white focus:outline-none focus:ring-2 focus:ring-green-300"
-        aria-label={isPlaying ? "Pause voice message" : "Play voice message"}
-      >
-        {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-      </button>
-      <div className="bg-gray-200 h-1 w-32 rounded-full">
-        <div
-          className="bg-green-500 h-1 rounded-full"
-          style={{ width: `${isPlaying ? 50 : 0}%` }}
-        ></div>
-      </div>
-      <audio ref={audioRef} src={url} onEnded={handleEnded} />
+      <audio src={url} controls preload="auto">
+        <source src={url} type="audio/mpeg" />
+        Tu navegador no soporta el audio.
+      </audio>
     </div>
   );
 };
-
 const DocumentMessage: React.FC<{
+  src: {
+    message: { data: ArrayBufferLike };
+    type: string;
+  };
   direction: "outgoing" | "incoming";
-}> = ({ direction }) => (
-  <div
-    className={`flex items-center space-x-2 ${
-      direction === "outgoing" ? "justify-end" : "justify-start"
-    }`}
-  >
-    <File size={24} />
-  </div>
-);
-
+}> = ({ src, direction }) => {
+  const url = URL.createObjectURL(
+    new Blob([new Uint8Array(src.message.data)], { type: "application/octet-stream" })
+  );
+  return (
+    <a
+      href={url}
+      download="documento"
+      className={`flex items-center text-blue-500 hover:underline ${
+        direction === "outgoing" ? "ml-auto" : "mr-auto"
+      }`}
+    >
+      <File size={24} className="mr-2" />
+      Ver documento
+    </a>
+  );
+};
 
 export default function EnhancedWhatsAppChat({ user }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
@@ -139,7 +143,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { specificData,refreshData } = useSpecificData(user?.phone);
+  const { specificData, refreshData } = useSpecificData(user?.phone);
   const [envio, setenvio] = useState<User | null>(null);
   const conversation = new Conversation(
     specificData.id,
@@ -164,12 +168,12 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       const sortedMessages = conversation.mergeArrays().sort((a, b) => {
         const timestampA = (a as WhatsappMessage).timestamp;
         const timestampB = (b as WhatsappMessage).timestamp;
-      
+
         if (!timestampA || !timestampB) {
           // You can decide how to handle this case, e.g., return 0 to keep the original order
           return 0;
         }
-      
+
         return new Date(timestampA).getTime() - new Date(timestampB).getTime();
       });
       setMessages(sortedMessages);
@@ -177,8 +181,6 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
     loadMessages();
   }, [specificData]);
-
-  
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -191,7 +193,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   }, [isRecording]);
 
   const handleNewMessage = (message: any) => {
-    console.log('Nuevo mensaje recibido:', message);
+    console.log("Nuevo mensaje recibido:", message);
     refreshData();
   };
 
@@ -203,8 +205,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
 
     ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      handleNewMessage(message);
+     // const message = JSON.parse(event.data);
+    //  handleNewMessage(message);
     };
     ws.onclose = () => {
       console.log("Desconectado del servidor WebSocket");
@@ -230,9 +232,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
   }, []);
 
-  
-
-  const handleSendMessage = async() => {
+  const handleSendMessage = async () => {
     if (inputText.trim()) {
       const newMessage: ChatMessages = {
         id: `${(messages?.length + 1).toString()}`,
@@ -247,58 +247,63 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
         mediaId: "",
       };
       setMessages([...messages, newMessage]);
-      setInputText("");
     }
     const array: WhatsappMessage[] = [
       {
-        id: Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15),
+        id:
+          Math.random().toString(36).substring(2, 15) +
+          Math.random().toString(36).substring(2, 15),
         message: inputText,
         to: specificData.phone,
         status: "delivered",
         direction: "outgoing",
         type: "text",
         mediaId: "",
-        attendant: 0
-      },        
-    ]
+        attendant: 0,
+      },
+    ];
     
-    const enviar:User ={
-      name: "Bot",
-      phone: "573025970185",
-      identification: "573025970185",
-      atending: 0,
-      lastActive: new Date(),
-      wppStatus: WhatsappStatus.attended,
-      WhatsappMessage: array,
-      detail: ""
-    }
-    setenvio(enviar)
+    const enviar: User = {
+      "name": "Bot",
+      "phone": "573025970185",
+      "identification": "573025970185",
+      "atending": 0,
+      "lastActive": new Date(),
+      "wppStatus": WhatsappStatus.attended,
+      "WhatsappMessage": array,
+     "detail": "",
+    };
+    //console.log(envio);
     // Send the first POST request to send the text message
+    setenvio(enviar);
     try {
       const [response, responseToSave] = await Promise.all([
-        fetch('http://localhost:4000/api/whatsapp/sendTextResponse', {
-          method: 'POST',
+        fetch("http://localhost:4000/api/whatsapp/sendTextResponse", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ message: inputText, id: specificData.phone }),
         }),
-        fetch('http://localhost:4000/api/prisma/frontmessage', {
-          method: 'POST',
+        fetch("http://localhost:4000/api/prisma/frontmessage", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(envio),
         }),
-      ])
-  
+      ]);
+      
+      setInputText("");
       if (!response.ok || !responseToSave.ok) {
-        throw new Error(`Error sending message: ${response.status} ${response.statusText} o ${responseToSave.status} ${responseToSave.statusText}`);
+        throw new Error(
+          `Error sending message: ${response.status} ${response.statusText} o ${responseToSave.status} ${responseToSave.statusText}`
+        );
       }
-  } catch (error) {
-    console.error('Error sending message:', error);
-  }
-}
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
 
   const handleFileUpload = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -308,11 +313,15 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const content = e.target?.result as string;
+        const content = e.target?.result as string; //
+        const urlMedia = event.target.files?.[0];
+        const base64StringWithoutPrefix = removeBase64Prefix(content);
+        const fileUrl = URL.createObjectURL(urlMedia!);
+        
         const newMessage: ChatMessages = {
           id: `${(messages?.length + 1).toString()}`,
-          type,
-          message: content, //aqui tiene que convertirse en un base64
+          type: file.type,
+          message: base64StringWithoutPrefix, 
           timestamp: new Date(),
           direction: "outgoing",
           to: specificData.phone,
@@ -321,6 +330,106 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           status: "delivered",
           mediaId: "",
         };
+        const sendToApi: any = {
+          id:
+          Math.random().toString(36).substring(2, 15) +
+          Math.random().toString(36).substring(2, 15),
+          name: "Bot",
+          phone: "573025970185",//numero del bot
+          type: file.type, //tipo de archivo toca desfragmentarlo para enviarlo a la ap
+          message: base64StringWithoutPrefix, 
+          timestamp: new Date(),
+          direction: "outgoing",
+          to: specificData.phone,
+          customerId: specificData.id,
+          attendant: specificData.attending,
+          status: "delivered",
+          mediaId: "",
+          
+        };
+        
+        
+        const documentTypes = {
+          "text/plain": "Texto",
+          "application/vnd.ms-excel": "Microsoft Excel",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Microsoft Excel",
+          "application/msword": "Microsoft Word",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Microsoft Word",
+          "application/vnd.ms-powerpoint": "Microsoft PowerPoint",
+          "application/vnd.openxmlformats-officedocument.presentationml.presentation": "Microsoft PowerPoint",
+          "application/pdf": "PDF",
+          "image/jpeg": "Imagen",
+          "image/png": "Imagen",
+          "image/gif": "Imagen",
+          "video/mp4": "Video",
+          "video/quicktime": "Video",
+          "video/mpeg": "Video",
+        };
+     
+        switch (newMessage.type) {
+          case "text/plain":
+          case "application/vnd.ms-excel":
+          case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+          case "application/msword":
+          case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+          case "application/vnd.ms-powerpoint":
+          case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+          case "application/pdf":
+            // Manejo de documentos
+            console.log("Documento recibido");
+            break;
+          case "image/jpeg":
+          case "image/png":
+          case "image/gif":
+            // Manejo de imágenes
+            console.log("Imagen recibida");
+            Promise.all([
+              fetch("http://localhost:4000/api/prisma//frontmessageImage", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(sendToApi),
+              })
+              .then((response) => response.json())
+              .then((data) => console.log(data))
+              .catch((error) => console.error(error)),
+              fetch("https://graph.facebook.com/v20.0/368124183059222/media", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "Authorization": "Bearer EAAMGwDhngcsBO6ZBXVhpIzU1GWOXbZBjwuri24DrWm6MdWDJWyIxPI4gtDMiA1UPjYIreLTgSudAftTjo5PHkNp7l4JgultA4mYim5JtcQHsB0axhNo1WM86aL4A9cNcQ6P5mQRq3P6ZArlmWWGdS1HWM00Y6j3ZCYs8rXv6YetWqwKSDrhlyucKhFmxrhww3S1wfE1Vw4DHkHXff9GDTfuOEtolfGISo3EoMPIZACQZDZD"
+                },
+                body: JSON.stringify({
+                  "messaging_product": "whatsapp",
+                  "recipient_type": "individual",
+                  "to": specificData.phone,
+                  "type": "image/jpeg",
+                  "file": fileUrl, 
+                })
+              })
+              .then((response) => response.json())
+              .then((data) => console.log(data))
+              .catch((error) => console.error(error))
+            ])
+            .then(() => console.log("Ambas solicitudes se han completado con éxito"))
+            .catch((error) => console.error("Error al enviar las solicitudes:", error));
+
+            break;
+          case "video/mp4":
+          case "video/quicktime":
+          case "video/mpeg":
+            // Manejo de videos
+            console.log("Video recibido");
+            break;
+          default:
+            console.log("Tipo de archivo no reconocido");
+            break;
+        }
+       
+        
+        
+  
         setMessages([...messages, newMessage]);
       };
       reader.readAsDataURL(file);
@@ -357,7 +466,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       </div>
     );
   }
-  
+
   return (
     <div className="flex flex-col h-screen bg-gray-100">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -379,25 +488,17 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                 <p className="text-sm">{message.message}</p>
               )}
               {message.type === "image" && (
-                <ImageMessage
-                  src={message}
-                  direction={message.direction}
-                />
+                <ImageMessage src={message} direction={message.direction} />
               )}
               {message.type === "video" && (
-                <VideoMessage
-                  src={message}
-                  direction={message.direction}
-                />
+                <VideoMessage src={message} direction={message.direction} />
               )}
               {message.type === "audio" && (
-                <VoiceMessage
-                  src={message}
-                  direction={message.direction}
-                />
+                <VoiceMessage src={message} direction={message.direction} />
               )}
+
               {message.type === "document" && (
-                <DocumentMessage direction={message.direction} />
+                <DocumentMessage direction={message.direction} src={message} />
               )}
               <p
                 className={`text-xs mt-1 ${

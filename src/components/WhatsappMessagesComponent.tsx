@@ -16,7 +16,7 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
 }) => {
   const { data, loading, error, refreshData } = useWhatsappData();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null); 
-  const [messages, setMessages] = useState([]);
+ // const [messages, setMessages] = useState([]);
 
     const handleClick = (item: User) => {
     {
