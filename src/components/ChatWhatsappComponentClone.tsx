@@ -7,12 +7,10 @@ import { ChatMessages } from "./interfaces/mergedDataMessages";
 import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { LoadingComponent } from "./LoadingComponente";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
-import { base64ToBlob } from "./functions";
 import {ImageMessage , VideoMessage, VoiceMessage, DocumentMessage} from "./chatcomponents";
 interface Props {
   user: any; // Define el tipo de usuario que se espera
 }
-
 
 export default function EnhancedWhatsAppChat({ user }: Props) {
   const [messages, setMessages] = useState<any[]>([]);
@@ -79,8 +77,9 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
 
     ws.onmessage = (event) => {
-       //const message = JSON.parse(event.data);
-      //  handleNewMessage(message);
+      //const message = JSON.parse(event.data);
+      //handleNewMessage(message);
+      refreshData();
     };
     ws.onclose = () => {
       console.log("Desconectado del servidor WebSocket");
@@ -176,6 +175,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       console.error("Error sending message:", error);
     }
   };
+//el template es casi igual al de texto si es audio debe decir el tipo y 
+//con su propia array de audio
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -186,12 +187,9 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const content = e.target?.result as string; //
-        const blob = base64ToBlob(content);
-       
+        const content = e.target?.result as string; // 
         const messagingProduct = "whatsapp";
         const base64StringWithoutPrefix = removeBase64Prefix(content);
-        //const fileUrl = URL.createObjectURL(urlMedia!);
         const formData = new FormData();
         formData.append("file", file);
         formData.append("type", file.type);
