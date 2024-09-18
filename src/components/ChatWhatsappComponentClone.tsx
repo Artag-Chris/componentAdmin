@@ -8,6 +8,7 @@ import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { LoadingComponent } from "./LoadingComponente";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 import {ImageMessage , VideoMessage, VoiceMessage, DocumentMessage} from "./chatcomponents";
+import { base64ToBlob } from "./functions";
 interface Props {
   user: any; // Define el tipo de usuario que se espera
 }
@@ -19,6 +20,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [mediaId, setMediaId] = useState<any>();
   const { specificData, refreshData } = useSpecificData(user?.phone);
   const [envio, setenvio] = useState<User | null>(null);
   const conversation = new Conversation(
@@ -188,13 +190,15 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const content = e.target?.result as string; // 
-        const messagingProduct = "whatsapp";
+        const blob = new Blob([content], { type: file.type }); 
         const base64StringWithoutPrefix = removeBase64Prefix(content);
         const formData = new FormData();
-        formData.append("file", file);
-        formData.append("type", file.type);
-        formData.append("messaging_product", messagingProduct);
+        formData.append("messaging_product", "whatsapp");
+        formData.append("file", blob);
+        formData.append("type", "image/jpeg");
 
+
+        
         const newMessage: ChatMessages = {
           id: `${(messages?.length + 1).toString()}`,
           type: file.type,
@@ -253,28 +257,41 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                 .then((data) => console.log(data))
                 .catch((error) => console.error(error)),
               fetch(
-                "https://graph.facebook.com/v20.0/368124183059222/media?messaging_product=whatsapp",
+                "https://graph.facebook.com/v20.0/368124183059222/media",
                 {
                   method: "POST",
                   headers: {
-                    "Content-Type": "application/json",
+                   // "Content-Type": "application/json",
                     Authorization:
-                      "Bearer EAAMGwDhngcsBO8ZB5C0hnmwzRB2AD53h6hPTI9N1xfWJldhFqCJ5xekhhcTLSqrHATRaGQ5eS90O1rZBPftRuUQdPsExZCTmFr66v7qfTqv5D1loiK5xqaDUwN94KSwXi8yZAw0KXxhtvwCdqA0bZAkGZAfzDUX6ZAGqtU0tTFkYlT9lRGJX9e8uuoZB1l72ml9deLvEl85k7Q4onk0LTiZCFTc1xNnhTwPvl4ddA1ZCojawZDZD",
+                      "Bearer EAAMGwDhngcsBO6OM9pqVZB00sgNEWG9hwrBMx78Yr1xeofKbL6fHVDgZCsuAZBxI5GKZAEGtWo2FUfS6tT1ZA697PsjqhQMkAZAZAgUxcrsFFqKWjTGUZBZBOgrBJfC04N7RFpA9WZCx97al6JeFZAuN5ujinzJ9gX0aQTrmrAockm37liuXt8R8o3TDsyBY3KjmavMS9MFxRCFJ7VPOb9xWremFL15hzUazSGOCYZCRLrm1bgZDZD",
                     // 'messaging_product': 'whatsapp'
                   },
-                  body: JSON.stringify({
-                    file: file,
-                    type: file.type,
-                    //messaging_product: 'whatsapp'
-                  }),
+                  body: formData,
                 }
               )
-                .then((response) => response.json())
+                .then((response) =>response.json()
+                 )
+                .then((data) => setMediaId(data)
+                ).then(() => console.log("Media ID:", mediaId)
+              )
+                .catch((error) => console.error(error)),
+                fetch("http://localhost:4000/api/whatsapp/sendImageResponse", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    to: specificData.phone,
+                    mediaId: mediaId,
+                    phone:"573025970185",
+                    type: file.type,
+                  }),
+                }).then((response) => response.json())
                 .then((data) => console.log(data))
                 .catch((error) => console.error(error)),
             ])
               .then(() =>
-                console.log("Ambas solicitudes se han completado con éxito")
+                console.log("todas solicitudes se han completado con éxito")
               )
               .catch((error) =>
                 console.error("Error al enviar las solicitudes:", error)
