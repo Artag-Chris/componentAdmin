@@ -9,6 +9,8 @@ import { LoadingComponent } from "./LoadingComponente";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 import {ImageMessage , VideoMessage, VoiceMessage, DocumentMessage} from "./chatcomponents";
 import { base64ToBlob } from "./functions";
+import { fi } from "date-fns/locale";
+import { Readable } from "node:stream";
 interface Props {
   user: any; // Define el tipo de usuario que se espera
 }
@@ -180,6 +182,28 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
 //el template es casi igual al de texto si es audio debe decir el tipo y 
 //con su propia array de audio
 
+//para enviar archivos a meta tienen que ser leidos con como stream de otra forma aunque los convierta en blob no sirven
+const fileToBlob = (file: File): Promise<Blob> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (result === null) {
+        reject(new Error('Failed to read file'));
+      } else {
+        const blob = new Blob([result], { type: file.type });
+        resolve(blob);
+      }
+    };
+    reader.onerror = () => {
+      reject(reader.error);
+    };
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+
+
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "image" | "video" | "document"
@@ -188,17 +212,16 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
 
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async(e) => {
         const content = e.target?.result as string; // 
-        const blob = new Blob([content], { type: file.type }); 
-        const base64StringWithoutPrefix = removeBase64Prefix(content);
+        const blob = await fileToBlob(file);
+        const base64StringWithoutPrefix =removeBase64Prefix(content);
         const formData = new FormData();
         formData.append("messaging_product", "whatsapp");
         formData.append("file", blob);
-        formData.append("type", "image/jpeg");
+        formData.append("type", file.type);
 
-
-        
+       // console.log(blob);
         const newMessage: ChatMessages = {
           id: `${(messages?.length + 1).toString()}`,
           type: file.type,
@@ -263,7 +286,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                   headers: {
                    // "Content-Type": "application/json",
                     Authorization:
-                      "Bearer EAAMGwDhngcsBO6OM9pqVZB00sgNEWG9hwrBMx78Yr1xeofKbL6fHVDgZCsuAZBxI5GKZAEGtWo2FUfS6tT1ZA697PsjqhQMkAZAZAgUxcrsFFqKWjTGUZBZBOgrBJfC04N7RFpA9WZCx97al6JeFZAuN5ujinzJ9gX0aQTrmrAockm37liuXt8R8o3TDsyBY3KjmavMS9MFxRCFJ7VPOb9xWremFL15hzUazSGOCYZCRLrm1bgZDZD",
+                      "Bearer EAAMGwDhngcsBO9wY3MGYZBZAaqZBKaTVKOnFH72ZBBgKdTWDhWcb6vhyMkOZC0BrXad8ZBxZB8i6eoE8fUqoGlosR3MTV9mOoMBpD8IhwLRyoxnVPDF6vG1mwvSR0sjIUSiFm04IN9rnZCTA6ttwp1Xf4bDONGvZBv867bO1YfduIuhcw7Yn90Uv6eglBuHvJzdfKojF8G7VFiXzEp11Qb52ZAIKPp6qbBwPrwOgKZATiV9EgZDZD",
                     // 'messaging_product': 'whatsapp'
                   },
                   body: formData,
