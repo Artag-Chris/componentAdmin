@@ -8,9 +8,6 @@ import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { LoadingComponent } from "./LoadingComponente";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 import {ImageMessage , VideoMessage, VoiceMessage, DocumentMessage} from "./chatcomponents";
-import { base64ToBlob } from "./functions";
-import { fi } from "date-fns/locale";
-import { Readable } from "node:stream";
 interface Props {
   user: any; // Define el tipo de usuario que se espera
 }
