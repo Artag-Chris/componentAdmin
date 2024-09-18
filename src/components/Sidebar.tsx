@@ -44,9 +44,9 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
               <FontAwesomeIcon icon={faComment} className="h-6 w-6 mr-2" /> Home
             </li>
           </a>
-          <a href="/about" className="block">
+          <a href="/SendMessages" className="block">
             <li className="p-4 hover:bg-gray-200 flex items-center rounded-md">
-              <FontAwesomeIcon icon={faEnvelope} className="h-6 w-6 mr-2" /> About
+              <FontAwesomeIcon icon={faEnvelope} className="h-6 w-6 mr-2" /> Send Messages
             </li>
           </a>
           <a href="/item3" className="block">
