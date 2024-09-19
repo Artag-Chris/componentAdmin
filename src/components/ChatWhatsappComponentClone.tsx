@@ -258,6 +258,57 @@ const fileToBlob = (file: File): Promise<Blob> => {
           case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
           case "application/pdf":
             // Manejo de documentos
+            Promise.all([
+              fetch("http://localhost:4000/api/prisma/frontmessagedocument", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(sendToApi),
+              })
+                // .then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((error) => console.error(error)),
+              fetch(
+                "https://graph.facebook.com/v20.0/368124183059222/media",
+                {
+                  method: "POST",
+                  headers: {
+                   // "Content-Type": "application/json",
+                    Authorization:
+                      "Bearer EAAMGwDhngcsBO64ASMkKZB38QxEVFZCst93n5di0NtHZBngsXemxAOB4p7jmZBIFZAKoUgGPSHn6hYGdPf7uJaw05ZCBc4GIYgEkRqyZCzycroJ8QFOeSlP3PTrsG7jSXKoGsxL4OruPfbElIDgLNGKRBA7yoMEMbZCvrLfxPWQwrvOjQ8Qvh4ak4HmZATxKHTwTBjmntQPb5tWghwk8NtRto4YLNNh14zuwr7TooCWDZCigZDZD",
+                    // 'messaging_product': 'whatsapp'
+                  },
+                  body: formData,
+                }
+              )
+                .then((response) =>response.json()
+                 )
+                .then((data) => setMediaId(data)
+                ).then(() => console.log("Media ID:", mediaId)
+              )
+                .catch((error) => console.error(error)),
+                fetch("http://localhost:4000/api/whatsapp/sendDocumentResponse", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    to: specificData.phone,
+                    mediaId: mediaId,
+                    phone:"573025970185",
+                    type: file.type,
+                  }),
+                }).then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((error) => console.error(error)),
+            ])
+              .then(() =>
+                console.log("todas solicitudes se han completado con éxito")
+              )
+              .catch((error) =>
+                console.error("Error al enviar las solicitudes:", error)
+              );
             console.log("Documento recibido");
             break;
           case "image/jpeg":
@@ -283,7 +334,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
                   headers: {
                    // "Content-Type": "application/json",
                     Authorization:
-                      "Bearer EAAMGwDhngcsBO9wY3MGYZBZAaqZBKaTVKOnFH72ZBBgKdTWDhWcb6vhyMkOZC0BrXad8ZBxZB8i6eoE8fUqoGlosR3MTV9mOoMBpD8IhwLRyoxnVPDF6vG1mwvSR0sjIUSiFm04IN9rnZCTA6ttwp1Xf4bDONGvZBv867bO1YfduIuhcw7Yn90Uv6eglBuHvJzdfKojF8G7VFiXzEp11Qb52ZAIKPp6qbBwPrwOgKZATiV9EgZDZD",
+                      "Bearer EAAMGwDhngcsBO64ASMkKZB38QxEVFZCst93n5di0NtHZBngsXemxAOB4p7jmZBIFZAKoUgGPSHn6hYGdPf7uJaw05ZCBc4GIYgEkRqyZCzycroJ8QFOeSlP3PTrsG7jSXKoGsxL4OruPfbElIDgLNGKRBA7yoMEMbZCvrLfxPWQwrvOjQ8Qvh4ak4HmZATxKHTwTBjmntQPb5tWghwk8NtRto4YLNNh14zuwr7TooCWDZCigZDZD",
                     // 'messaging_product': 'whatsapp'
                   },
                   body: formData,
@@ -322,6 +373,58 @@ const fileToBlob = (file: File): Promise<Blob> => {
           case "video/quicktime":
           case "video/mpeg":
             // Manejo de videos
+            Promise.all([
+              fetch("http://localhost:4000/api/prisma/frontmessagevideo", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(sendToApi),
+              })
+                // .then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((error) => console.error(error)),
+              fetch(
+                "https://graph.facebook.com/v20.0/368124183059222/media",
+                {
+                  method: "POST",
+                  headers: {
+                   // "Content-Type": "application/json",
+                    Authorization:
+                      "Bearer EAAMGwDhngcsBO64ASMkKZB38QxEVFZCst93n5di0NtHZBngsXemxAOB4p7jmZBIFZAKoUgGPSHn6hYGdPf7uJaw05ZCBc4GIYgEkRqyZCzycroJ8QFOeSlP3PTrsG7jSXKoGsxL4OruPfbElIDgLNGKRBA7yoMEMbZCvrLfxPWQwrvOjQ8Qvh4ak4HmZATxKHTwTBjmntQPb5tWghwk8NtRto4YLNNh14zuwr7TooCWDZCigZDZD",
+                    // 'messaging_product': 'whatsapp'
+                  },
+                  body: formData,
+                }
+              )
+                .then((response) =>response.json()
+                 )
+                .then((data) => setMediaId(data)
+                ).then(() => console.log("Media ID:", mediaId)
+              )
+                .catch((error) => console.error(error)),
+                fetch("http://localhost:4000/api/whatsapp/sendVideoResponse", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    to: specificData.phone,
+                    mediaId: mediaId,
+                    phone:"573025970185",
+                    type: file.type,
+                  }),
+                }).then((response) => response.json())
+                .then((data) => console.log(data))
+                .catch((error) => console.error(error)),
+            ])
+              .then(() =>
+                console.log("todas solicitudes se han completado con éxito")
+              )
+              .catch((error) =>
+                console.error("Error al enviar las solicitudes:", error)
+              );
+            console.log("Documento recibido");
             console.log("Video recibido");
             break;
           default:
