@@ -1,6 +1,6 @@
 
-//import { useState, useEffect } from 'react';
-/*
+import { useState, useEffect } from 'react';
+
 interface UseTemplatesResponse {
   templates: any[];
   error: any;
@@ -33,4 +33,4 @@ const useTemplates = (): UseTemplatesResponse => {
   return { templates, error, loading };
 };
 
-export default useTemplates; */
+export default useTemplates; 
