@@ -107,7 +107,7 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
           <div className="pt-4">
             <button className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center">
               <Send className="mr-2 h-5 w-5" />
-              Envio de plantilla
+              Envio de Plantilla
             </button>
           </div>
         </div>
