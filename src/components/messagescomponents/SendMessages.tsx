@@ -1,16 +1,34 @@
 import React from 'react';
+import ImageTemplateSeleted from './ImageTemplateSeleted';
+import BodyTemplateSelected from './BodyTemplateSelected';
+import { getVariableCount } from '../functions';
 
 type SendMessagesTemplateProps = {
   selectedTemplate: any; // Ajusta el tipo según corresponda
 };
 
 export const SendMessagesTemplate: React.FC<SendMessagesTemplateProps> = ({ selectedTemplate }) => {
-  console.log('desde el componente SendMessages');
-  console.log(selectedTemplate);
+  const[variables, setVariables] = React.useState<any>();
+ 
 
   return (
     <div>
-      <h1>{selectedTemplate.name}</h1>
+       <h1>{selectedTemplate.name}</h1>
+       {selectedTemplate.components[0].type === 'HEADER' && (
+        <ImageTemplateSeleted selectedTemplate={selectedTemplate} />
+      )}
+        {selectedTemplate.components[0].type === 'BODY' && (
+        <BodyTemplateSelected  selectedTemplate={selectedTemplate}/>
+      )}
+
+     
+    </div>
+  );
+};
+
+/* 
+
+ <h1>{selectedTemplate.name}</h1>
       {selectedTemplate.components[0].type === 'HEADER' && (
         <>
           <h2>Tiene imagen</h2>
@@ -44,7 +62,5 @@ export const SendMessagesTemplate: React.FC<SendMessagesTemplateProps> = ({ sele
           <h2>{selectedTemplate.components[1].text}</h2>
         </>
       )}
-     
-    </div>
-  );
-};
+
+*/

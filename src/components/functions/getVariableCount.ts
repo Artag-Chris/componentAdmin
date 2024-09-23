@@ -18,12 +18,10 @@ export function getVariableCount(templateName: string) {
       variableCount = 0;
     }
   
-    // Verificar si el nombre de la plantilla contiene la palabra "imagen"
-    const hasImage = /imagen/.test(lowerCaseName);
+
   
     // Devolver un objeto con el número de variables y si contiene imagen
-    return {
-      variableCount,
-      hasImage
-    };
+    return { variableCount }
+    
+    
   }
