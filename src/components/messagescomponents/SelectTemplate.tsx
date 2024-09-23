@@ -12,7 +12,7 @@ interface SendMessagesProps {
 
 const sendMessages = async (messages:any, templateId:any, phoneNumber:any, additionalInfo:any) => {
   await new Promise(resolve => setTimeout(resolve, 2000))
-  console.log("Messages sent:", messages, "Template ID:", templateId, "From:", phoneNumber, "Additional Info:", additionalInfo)
+ // console.log("Messages sent:", messages, "Template ID:", templateId, "From:", phoneNumber, "Additional Info:", additionalInfo)
   return { success: true, messagesSent: messages.length }
 } 
  export default function SendMessages(

@@ -1,19 +1,91 @@
-"use client";
 
 import React, { useEffect, useState } from "react";
 import { ImageTemplateReceived } from "../interfaces";
-import { getVariableCount } from "../functions";
-import { Upload, Send, Image as ImageIcon } from "lucide-react";
+import { getVariableCount, sendTemplate } from "../functions";
+import { Upload, Send, Image as ImageIcon, Phone } from "lucide-react";
 
 const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
   selectedTemplate,
 }) => {
   const [variables, setVariables] = useState<any>();
+  const [variableValues, setVariableValues] = useState<{ [key: string]: string }>({});
   const [imageUrl, setImageUrl] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     setVariables(getVariableCount(selectedTemplate.name));
   }, [selectedTemplate]);
+
+  const handleSendTemplate = () => {
+   interface Payload {
+        phone: string,
+        mediaId: string,
+        texto?: string;
+        texto2?: string;
+        texto3?: string;
+        texto4?: string;
+      };
+      let payload: Payload = {
+        phone: `${phoneNumber}`,
+        mediaId: `${imageUrl}`
+      };
+   
+    switch (getVariableCount(selectedTemplate.name).variableCount) {
+      case 0:
+        if (!imageUrl.trim()) {
+            console.error("Error: La URL de la imagen no puede estar vacía");
+            return;
+          }
+        
+        sendTemplate("http://localhost:4000/api/whatsapp/sinvariableimage", payload);
+        
+        break;
+      case 1:
+        if (!imageUrl.trim()) {
+            console.error("Error: La URL de la imagen no puede estar vacía");
+            return;
+          }
+          payload = {
+            ...payload,
+            texto: `${variableValues.variable1}`,
+          };
+        sendTemplate("http://localhost:4000/api/whatsapp/unavariableimage", payload);
+          
+        break;
+      case 2:
+        payload = {
+            ...payload,
+            texto: `${variableValues.variable1}`,
+            texto2: `${variableValues.variable2}`,
+          };
+        sendTemplate("http://localhost:4000/api/whatsapp/dosvariableimage", payload);
+        break;
+      case 3:
+        payload = {
+            ...payload,
+            texto: `${variableValues.variable1}`,
+            texto2: `${variableValues.variable2}`,
+            texto3: `${variableValues.variable3}`,
+          };
+        sendTemplate("http://localhost:4000/api/whatsapp/tresvariableimage", payload);
+        break;
+      case 4:
+        payload = {
+            ...payload,
+            texto: `${variableValues.variable1}`,
+            texto2: `${variableValues.variable2}`,
+            texto3: `${variableValues.variable3}`,
+            texto4: `${variableValues.variable4}`,
+          };
+        sendTemplate("http://localhost:4000/api/whatsapp/cuatrovariableimage", payload);
+        break;
+      default:
+        // Código para manejar otros tipos de componentes
+        break;
+    }
+    //console.log("Número de teléfono a enviar:", phoneNumber);
+  };
+  console.log(variableValues);
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
@@ -42,12 +114,28 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
                 type="text"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="sube la imagen desde internet"
+                placeholder="Sube la imagen desde internet"
                 className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
               <button className="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-300">
                 <Upload className="h-5 w-5" />
               </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Número de Teléfono a Enviar
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="Ingresa el número de teléfono"
+                className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <Phone className="h-5 w-5 text-gray-400" />
             </div>
           </div>
 
@@ -65,7 +153,16 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
                     </label>
                     <input
                       type="text"
-                      placeholder={`Ingresa el texto de la variable ${index + 1}`}
+                      placeholder={`Ingresa el texto de la variable ${
+                        index + 1
+                      }`}
+                      value={variableValues[`variable${index + 1}`] || ""}
+                      onChange={(e) =>
+                        setVariableValues({
+                          ...variableValues,
+                          [`variable${index + 1}`]: e.target.value,
+                        })
+                      }
                       className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
@@ -76,7 +173,6 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
           {selectedTemplate.components[3] &&
             selectedTemplate.components[3].type === "BUTTONS" && (
               <div className="space-y-4">
-               
                 <div className="flex flex-wrap gap-2">
                   {selectedTemplate.components[3] &&
                     selectedTemplate.components[3].type === "BUTTONS" &&
@@ -105,9 +201,12 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
             )}
 
           <div className="pt-4">
-            <button className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center">
+            <button
+              className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center"
+              onClick={handleSendTemplate}
+            >
               <Send className="mr-2 h-5 w-5" />
-              Envio de Plantilla
+              Envío de Plantilla
             </button>
           </div>
         </div>
