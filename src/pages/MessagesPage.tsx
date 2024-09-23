@@ -7,11 +7,9 @@ export default function TemplatesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">Message Templates</h1>
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-1/3">
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">Select Template</h2>
             <SelectTemplateMessages 
               setSelectedTemplate={setSelectedTemplate} 
               selectedTemplate={selectedTemplate} 
@@ -21,7 +19,6 @@ export default function TemplatesPage() {
         <div className="w-full lg:w-2/3">
           {selectedTemplate ? (
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-700 mb-4">Template Preview</h2>
               <SendMessagesTemplate selectedTemplate={selectedTemplate} />
             </div>
           ) : (
