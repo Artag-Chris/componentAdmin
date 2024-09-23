@@ -145,7 +145,7 @@ export default function SendMessages({
                     <button
                       key={template.id}
                       onClick={() => {
-                        setSelectedTemplate(template);
+                        setSelectedTemplate(template);//no se puede convertir a string hay que encontrar otra solucion
                        
                         setIsTemplateDropdownOpen(false);
                       }}
