@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { ImageTemplateReceived } from "../interfaces";
 import { getVariableCount, sendTemplate } from "../functions";
-import { Upload, Send, Image as ImageIcon, Phone } from "lucide-react";
+import { Upload, Send,  Phone } from "lucide-react";
 
 const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
   selectedTemplate,
