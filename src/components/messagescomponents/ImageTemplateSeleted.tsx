@@ -83,9 +83,9 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
         // Código para manejar otros tipos de componentes
         break;
     }
-    //console.log("Número de teléfono a enviar:", phoneNumber);
+
   };
-  console.log(variableValues);
+  
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
