@@ -10,7 +10,9 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
   selectedTemplate,
 }) => {
   const [variables, setVariables] = useState<any>();
-  const [variableValues, setVariableValues] = useState<{ [key: string]: string }>({});
+  const [variableValues, setVariableValues] = useState<{
+    [key: string]: string;
+  }>({});
   const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
@@ -19,79 +21,78 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
 
   const handleSendTemplate = () => {
     interface Payload {
-         phone: string,
-         texto?: string;
-         texto2?: string;
-         texto3?: string;
-         texto4?: string;
-       };
-       let payload: Payload = {
-         phone: `${phoneNumber}`,
-       
-       };
-    
-     switch (getVariableCount(selectedTemplate.name).variableCount) {
-       case 0:
-       
-         
-         sendTemplate("http://localhost:4000/api/whatsapp/sinvariable", payload);
-         
-         break;
-       case 1:
-        
-           payload = {
-             ...payload,
-             texto: `${variableValues.variable1}`,
-           };
-         sendTemplate("http://localhost:4000/api/whatsapp/unavariable", payload);
-           
-         break;
-       case 2:
-         payload = {
-             ...payload,
-             texto: `${variableValues.variable1}`,
-             texto2: `${variableValues.variable2}`,
-           };
-         sendTemplate("http://localhost:4000/api/whatsapp/dosvariable", payload);
-         break;
-       case 3:
-         payload = {
-             ...payload,
-             texto: `${variableValues.variable1}`,
-             texto2: `${variableValues.variable2}`,
-             texto3: `${variableValues.variable3}`,
-           };
-         sendTemplate("http://localhost:4000/api/whatsapp/tresvariable", payload);
-         break;
-       case 4:
-         payload = {
-             ...payload,
-             texto: `${variableValues.variable1}`,
-             texto2: `${variableValues.variable2}`,
-             texto3: `${variableValues.variable3}`,
-             texto4: `${variableValues.variable4}`,
-           };
-         sendTemplate("http://localhost:4000/api/whatsapp/cuatrovariable", payload);
-         break;
-       default:
-         // Código para manejar otros tipos de componentes
-         break;
-     }
- 
-   };
+      phone: string;
+      texto?: string;
+      texto2?: string;
+      texto3?: string;
+      texto4?: string;
+    }
+    let payload: Payload = {
+      phone: `${phoneNumber}`,
+    };
+
+    switch (getVariableCount(selectedTemplate.name).variableCount) {
+      case 0:
+        sendTemplate("http://localhost:4000/api/whatsapp/sinvariable", payload);
+
+        break;
+      case 1:
+        payload = {
+          ...payload,
+          texto: `${variableValues.variable1}`,
+        };
+        sendTemplate("http://localhost:4000/api/whatsapp/unavariable", payload);
+
+        break;
+      case 2:
+        payload = {
+          ...payload,
+          texto: `${variableValues.variable1}`,
+          texto2: `${variableValues.variable2}`,
+        };
+        sendTemplate("http://localhost:4000/api/whatsapp/dosvariable", payload);
+        break;
+      case 3:
+        payload = {
+          ...payload,
+          texto: `${variableValues.variable1}`,
+          texto2: `${variableValues.variable2}`,
+          texto3: `${variableValues.variable3}`,
+        };
+        sendTemplate(
+          "http://localhost:4000/api/whatsapp/tresvariable",
+          payload
+        );
+        break;
+      case 4:
+        payload = {
+          ...payload,
+          texto: `${variableValues.variable1}`,
+          texto2: `${variableValues.variable2}`,
+          texto3: `${variableValues.variable3}`,
+          texto4: `${variableValues.variable4}`,
+        };
+        sendTemplate(
+          "http://localhost:4000/api/whatsapp/cuatrovariable",
+          payload
+        );
+        break;
+      default:
+        // Código para manejar otros tipos de componentes
+        break;
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
         <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-6">
-          <h2 className="text-2xl font-bold text-white">
-            Plantilla con Texto
-          </h2>
+          <h2 className="text-2xl font-bold text-white">Plantilla con Texto</h2>
         </div>
         <div className="p-6 space-y-6">
           <div className="bg-gray-100 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
-            Ejemplo del texto de la plantilla
+              Ejemplo del texto de la plantilla
             </h3>
             <p className="text-gray-600">
               {selectedTemplate.components[0].text}
@@ -129,7 +130,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
             </div>
           )}
 
-<div className="space-y-4">
+          <div className="space-y-4">
             <label className="block text-sm font-medium text-gray-700">
               Número de Teléfono a Enviar
             </label>
@@ -146,9 +147,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
           </div>
 
           <div className="bg-gray-100 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Footer
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">Footer</h3>
             <p className="text-gray-600">
               {selectedTemplate.components[1].text}
             </p>
@@ -176,8 +175,10 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
             )}
 
           <div className="pt-4">
-            <button className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center"
-            onClick={handleSendTemplate}>
+            <button
+              className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center"
+              onClick={handleSendTemplate}
+            >
               <Send className="mr-2 h-5 w-5" />
               Envio de plantilla
             </button>

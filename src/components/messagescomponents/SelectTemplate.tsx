@@ -7,25 +7,33 @@ import useTemplates from "../hook/useTemplates";
 interface SendMessagesProps {
   setSelectedTemplate: (template: string) => void;
   selectedTemplate: string;
+  setIsExcelFileLoaded: (isExcelFileLoaded: boolean) => void;
 }
 
 const sendMessages = async (
   messages: any,
-  templateId: any,
-  phoneNumber: any,
-  additionalInfo: any
+ // templateId: any, el nombre de la plantilla
+ // phoneNumber: any, //
+ // additionalInfo: any  sera opcional o borrado este campo
 ) => {
+  /*
   await new Promise((resolve) => setTimeout(resolve, 2000));
   // console.log("Messages sent:", messages, "Template ID:", templateId, "From:", phoneNumber, "Additional Info:", additionalInfo)
-  return { success: true, messagesSent: messages.length };
+  return { success: true, messagesSent: messages.length };*/
+  messages.forEach((fila: any) => {
+    // Aquí debes enviar un mensaje con los datos de la fila
+    console.log(fila);
+  });
+ 
 };
 export default function SendMessages({
   setSelectedTemplate,
   selectedTemplate,
+  setIsExcelFileLoaded
 }: SendMessagesProps) {
   const { templates, error, loading } = useTemplates();
   const { phoneNumbers } = usePhoneNumbers();
-
+ 
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState("");
   const [file, setFile] = useState<any>(null);
   const [messages, setMessages] = useState<any[][]>([]);
@@ -47,12 +55,14 @@ export default function SendMessages({
     const reader = new FileReader();
     reader.onload = (evt) => {
       if (evt.target) {
+        setIsExcelFileLoaded(true);
         const bstr = evt.target.result;
         const wb = XLSX.read(bstr, { type: "binary" });
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
         const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
         setMessages(data as any[][]);
+        setIsExcelFileLoaded(true);
       }
     };
     reader.readAsArrayBuffer(file);
@@ -62,6 +72,8 @@ export default function SendMessages({
     if (!selectedTemplate || !selectedPhoneNumber || messages.length === 0)
       return;
     setIsLoading(true);
+    console.log("Sending messages:", messages, "Template:", selectedTemplate, "Phone:", selectedPhoneNumber, "Additional Info:", additionalInfo)
+    /*
     try {
       const result = await sendMessages(
         messages,
@@ -78,6 +90,7 @@ export default function SendMessages({
         error: "some error message",
       });
     }
+      */
     setIsLoading(false);
   };
 
@@ -178,13 +191,15 @@ export default function SendMessages({
                     htmlFor="file-upload"
                     className="block w-full px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100 cursor-pointer"
                   >
-                    Upload New File
+                    Seleciona un archivo de excel
                     <input
+                    
                       id="file-upload"
                       type="file"
                       accept=".xlsx, .xls"
                       onChange={handleFileUpload}
                       className="hidden"
+                      
                     />
                   </label>
                   {file && (
@@ -192,6 +207,7 @@ export default function SendMessages({
                       onClick={() => {
                         setFile(null);
                         setIsFileDropdownOpen(false);
+                        setIsExcelFileLoaded(false);
                       }}
                       className="block w-full px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
                     >
