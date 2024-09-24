@@ -2,17 +2,83 @@
 
 import React, { useEffect, useState } from "react";
 import { BodyTemplateReceived } from "../interfaces";
-import { getVariableCount } from "../functions";
-import { Send } from "lucide-react";
+import { getVariableCount, sendTemplate } from "../functions";
+import { Send, Phone } from "lucide-react";
+import { text } from "stream/consumers";
 
 const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
   selectedTemplate,
 }) => {
   const [variables, setVariables] = useState<any>();
+  const [variableValues, setVariableValues] = useState<{ [key: string]: string }>({});
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   useEffect(() => {
     setVariables(getVariableCount(selectedTemplate.name));
   }, [selectedTemplate]);
+
+  const handleSendTemplate = () => {
+    interface Payload {
+         phone: string,
+         texto?: string;
+         texto2?: string;
+         texto3?: string;
+         texto4?: string;
+       };
+       let payload: Payload = {
+         phone: `${phoneNumber}`,
+       
+       };
+    
+     switch (getVariableCount(selectedTemplate.name).variableCount) {
+       case 0:
+       
+         
+         sendTemplate("http://localhost:4000/api/whatsapp/sinvariable", payload);
+         
+         break;
+       case 1:
+        
+           payload = {
+             ...payload,
+             texto: `${variableValues.variable1}`,
+           };
+         sendTemplate("http://localhost:4000/api/whatsapp/unavariable", payload);
+           
+         break;
+       case 2:
+         payload = {
+             ...payload,
+             texto: `${variableValues.variable1}`,
+             texto2: `${variableValues.variable2}`,
+           };
+         sendTemplate("http://localhost:4000/api/whatsapp/dosvariable", payload);
+         break;
+       case 3:
+         payload = {
+             ...payload,
+             texto: `${variableValues.variable1}`,
+             texto2: `${variableValues.variable2}`,
+             texto3: `${variableValues.variable3}`,
+           };
+         sendTemplate("http://localhost:4000/api/whatsapp/tresvariable", payload);
+         break;
+       case 4:
+         payload = {
+             ...payload,
+             texto: `${variableValues.variable1}`,
+             texto2: `${variableValues.variable2}`,
+             texto3: `${variableValues.variable3}`,
+             texto4: `${variableValues.variable4}`,
+           };
+         sendTemplate("http://localhost:4000/api/whatsapp/cuatrovariable", payload);
+         break;
+       default:
+         // Código para manejar otros tipos de componentes
+         break;
+     }
+ 
+   };
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
@@ -46,13 +112,38 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
                     </label>
                     <input
                       type="text"
-                      placeholder={`Ingresa el valor de la Variable ${index + 1}`}
+                      placeholder={`Ingresa el texto de la variable ${
+                        index + 1
+                      }`}
+                      value={variableValues[`variable${index + 1}`] || ""}
+                      onChange={(e) =>
+                        setVariableValues({
+                          ...variableValues,
+                          [`variable${index + 1}`]: e.target.value,
+                        })
+                      }
                       className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                 ))}
             </div>
           )}
+
+<div className="space-y-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Número de Teléfono a Enviar
+            </label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="Ingresa el número de teléfono"
+                className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <Phone className="h-5 w-5 text-gray-400" />
+            </div>
+          </div>
 
           <div className="bg-gray-100 p-4 rounded-lg">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">
@@ -85,7 +176,8 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
             )}
 
           <div className="pt-4">
-            <button className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center">
+            <button className="w-full py-2 px-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-md hover:from-purple-600 hover:to-pink-600 transition-all duration-300 flex items-center justify-center"
+            onClick={handleSendTemplate}>
               <Send className="mr-2 h-5 w-5" />
               Envio de plantilla
             </button>
