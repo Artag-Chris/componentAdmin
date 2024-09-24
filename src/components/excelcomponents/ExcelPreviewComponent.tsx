@@ -6,54 +6,22 @@ interface ExcelPreviewProps {
   // En el futuro, esto se reemplazará con los datos reales pasados como prop
   // data: any[][]
   selectedTemplate: any;
+  messages: any[][];
+  imageUrl:string
+  setImageUrl: (imageUrl: string) => void;
 }
 
-const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate }) => {
+const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate,messages,imageUrl,setImageUrl }) => {
   const [variables, setVariables] = useState<any>();
   const [currentPage, setCurrentPage] = useState(1);
-  const [imageUrl, setImageUrl] = useState("");
+  
   const rowsPerPage = 10;
 
-  // Datos dummy para simular el contenido del Excel
-  const dummyData = [
-    ["Nombre", "edad", "Ciudad", "Ocupación", "Salario", "telefono"],
-    ["John Doe", "30", "New York", "Engineer", "$80,000", "3152005752"],
-    ["Jane Smith", "28", "Los Angeles", "Designer", "$75,000", "3152005752"],
-    ["Mike Johnson", "35", "Chicago", "Manager", "$90,000", "3152005752"],
-    ["David Lee", "32", "Boston", "Analyst", "$70,000", "3152005752"],
-    ["Sarah Davis", "29", "Seattle", "Marketing", "$72,000", "3152005752"],
-    ["Tom Wilson", "38", "Miami", "Sales", "$78,000", "3152005752"],
-    ["Lisa Taylor", "31", "Denver", "HR", "$68,000", "3152005752"],
-    [
-      "Chris Martin",
-      "33",
-      "Austin",
-      "Product Manager",
-      "$88,000",
-      "3152005752",
-    ],
-    ["Anna White", "27", "Portland", "UX Designer", "$76,000", "3152005752"],
-    [
-      "Kevin Brown",
-      "36",
-      "Philadelphia",
-      "Data Scientist",
-      "$92,000",
-      "3152005752",
-    ],
-    ["Rachel Green", "30", "San Diego", "Teacher", "$65,000", "3152005752"],
-    ["Mark Thompson", "34", "Dallas", "Accountant", "$71,000", "3152005752"],
-    ["Olivia Johnson", "29", "Houston", "Lawyer", "$95,000", "3152005752"],
-    ["Daniel Kim", "31", "Atlanta", "Architect", "$82,000", "3152005752"],
-    ["Sophie Chen", "28", "Phoenix", "Nurse", "$69,000", "3152005752"],
-    ["Ryan Patel", "33", "Detroit", "Consultant", "$86,000", "3152005752"],
-    ["Emma Watson", "27", "Minneapolis", "Journalist", "$67,000", "3152005752"],
-    ["Alex Rodriguez", "35", "Las Vegas", "Chef", "$73,000", "3152005752"],
-  ];
+ 
 
-  const totalPages = Math.ceil((dummyData.length - 1) / rowsPerPage);
+  const totalPages = Math.ceil((messages.length - 1) / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage + 1;
-  const endIndex = Math.min(startIndex + rowsPerPage - 1, dummyData.length - 1);
+  const endIndex = Math.min(startIndex + rowsPerPage - 1, messages.length - 1);
 
   const nextPage = () => {
     if (currentPage < totalPages) {
@@ -121,7 +89,7 @@ const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate }) => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  {dummyData[0].map((header, index) => (
+                  {messages[0].map((header, index) => (
                     <th
                       key={index}
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -132,7 +100,7 @@ const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate }) => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {dummyData
+                {messages
                   .slice(startIndex, endIndex + 1)
                   .map((row, rowIndex) => (
                     <tr

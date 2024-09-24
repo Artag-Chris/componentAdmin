@@ -3,11 +3,15 @@ import { Loader2, Send, FileSpreadsheet, ChevronDown } from "lucide-react";
 import * as XLSX from "xlsx";
 import usePhoneNumbers from "../hook/usePhoneNumberToSend";
 import useTemplates from "../hook/useTemplates";
+import { getVariableCount } from "../functions";
 
 interface SendMessagesProps {
   setSelectedTemplate: (template: string) => void;
-  selectedTemplate: string;
+  selectedTemplate: any;
   setIsExcelFileLoaded: (isExcelFileLoaded: boolean) => void;
+  setMessages: (messages: any) => void;
+  messages: any;
+  imageUrl: string;
 }
 
 const sendMessages = async (
@@ -29,14 +33,17 @@ const sendMessages = async (
 export default function SendMessages({
   setSelectedTemplate,
   selectedTemplate,
-  setIsExcelFileLoaded
+  setIsExcelFileLoaded,
+  setMessages,
+  messages,
+  imageUrl
 }: SendMessagesProps) {
   const { templates, error, loading } = useTemplates();
   const { phoneNumbers } = usePhoneNumbers();
  
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState("");
   const [file, setFile] = useState<any>(null);
-  const [messages, setMessages] = useState<any[][]>([]);
+  
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -73,24 +80,8 @@ export default function SendMessages({
       return;
     setIsLoading(true);
     console.log("Sending messages:", messages, "Template:", selectedTemplate, "Phone:", selectedPhoneNumber, "Additional Info:", additionalInfo)
-    /*
-    try {
-      const result = await sendMessages(
-        messages,
-        selectedTemplate,
-        selectedPhoneNumber,
-        additionalInfo
-      );
-      setResult(result);
-    } catch (error) {
-      console.error("Error sending messages:", error);
-      setResult({
-        success: false,
-        messagesSent: null,
-        error: "some error message",
-      });
-    }
-      */
+   
+   
     setIsLoading(false);
   };
 
@@ -206,12 +197,13 @@ export default function SendMessages({
                     <button
                       onClick={() => {
                         setFile(null);
-                        setIsFileDropdownOpen(false);
+                        setMessages([]);
                         setIsExcelFileLoaded(false);
+                        setIsFileDropdownOpen(false);
                       }}
                       className="block w-full px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
                     >
-                      Clear File
+                      Eliminar archivo
                     </button>
                   )}
                 </div>
