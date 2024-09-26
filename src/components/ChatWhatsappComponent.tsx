@@ -8,6 +8,7 @@ import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { LoadingComponent } from "./LoadingComponente";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 import {ImageMessage , VideoMessage, VoiceMessage, DocumentMessage} from "./chatcomponents";
+import { botNumber, documentResponse, fileMediaMeta, frontDocument, frontImage, frontMessage, frontVideo, imageResponse, metaToken, textResponse, videoResponse } from "./config/envs";
 interface Props {
   user: any; // Define el tipo de usuario que se espera
 }
@@ -47,10 +48,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
         const timestampB = (b as WhatsappMessage).timestamp;
 
         if (!timestampA || !timestampB) {
-          // You can decide how to handle this case, e.g., return 0 to keep the original order
           return 0;
         }
-
         return new Date(timestampA).getTime() - new Date(timestampB).getTime();
       });
       setMessages(sortedMessages);
@@ -78,8 +77,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
 
     ws.onmessage = (event) => {
-      //const message = JSON.parse(event.data);
-      //handleNewMessage(message);
+    // aqui ira logica para la transferencia de mensajes por ahora si se recibe un mensaje
+    //se carga el array de mensajes
       refreshData();
     };
     ws.onclose = () => {
@@ -93,12 +92,12 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     const reconnectWebSocket = () => {
       setTimeout(() => {
         const ws = new WebSocket("ws://localhost:4000/ws");
-        // Aquí puedes volver a establecer los eventos ws.onopen, ws.onmessage, etc.
         ws.onopen = () => {
           console.log("Reconectado al servidor WebSocket");
         };
         // ...
-      }, 5000); // Intenta reconectar después de 5 segundos
+      }, 5000); // Intenta reconectar después de 5 segundos despues debera ser un numero random de 5 a 25
+
     };
 
     return () => {
@@ -150,14 +149,14 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     setenvio(enviar);
     try {
       const [response, responseToSave] = await Promise.all([
-        fetch("http://localhost:4000/api/whatsapp/sendTextResponse", {
+        fetch(textResponse, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ message: inputText, id: specificData.phone }),
         }),
-        fetch("http://localhost:4000/api/prisma/frontmessage", {
+        fetch(frontMessage, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -176,10 +175,9 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       console.error("Error sending message:", error);
     }
   };
-//el template es casi igual al de texto si es audio debe decir el tipo y 
-//con su propia array de audio
 
-//para enviar archivos a meta tienen que ser leidos con como stream de otra forma aunque los convierta en blob no sirven
+// para enviar archivos a meta tienen que ser leidos con como stream
+// de otra forma aunque los convierta en blob no sirven
 const fileToBlob = (file: File): Promise<Blob> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -236,7 +234,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
             Math.random().toString(36).substring(2, 15) +
             Math.random().toString(36).substring(2, 15),
           name: "Bot",
-          phone: "573025970185", //numero del bot
+          phone: botNumber, //numero del bot
           type: file.type, //tipo de archivo toca desfragmentarlo para enviarlo a la ap
           message: base64StringWithoutPrefix,
           timestamp: new Date(),
@@ -259,7 +257,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
           case "application/pdf":
             // Manejo de documentos
             Promise.all([
-              fetch("http://localhost:4000/api/prisma/frontmessagedocument", {
+              fetch(frontDocument, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -270,14 +268,13 @@ const fileToBlob = (file: File): Promise<Blob> => {
                 .then((data) => console.log(data))
                 .catch((error) => console.error(error)),
               fetch(
-                "https://graph.facebook.com/v20.0/368124183059222/media",
+                fileMediaMeta,
                 {
                   method: "POST",
                   headers: {
-                   // "Content-Type": "application/json",
+                   // "Content-Type": "application/json", no puede ir con archivos distintos a texto
                     Authorization:
-                      "Bearer EAAMGwDhngcsBO64ASMkKZB38QxEVFZCst93n5di0NtHZBngsXemxAOB4p7jmZBIFZAKoUgGPSHn6hYGdPf7uJaw05ZCBc4GIYgEkRqyZCzycroJ8QFOeSlP3PTrsG7jSXKoGsxL4OruPfbElIDgLNGKRBA7yoMEMbZCvrLfxPWQwrvOjQ8Qvh4ak4HmZATxKHTwTBjmntQPb5tWghwk8NtRto4YLNNh14zuwr7TooCWDZCigZDZD",
-                    // 'messaging_product': 'whatsapp'
+                      `Bearer ${metaToken}`,
                   },
                   body: formData,
                 }
@@ -288,7 +285,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
                 ).then(() => console.log("Media ID:", mediaId)
               )
                 .catch((error) => console.error(error)),
-                fetch("http://localhost:4000/api/whatsapp/sendDocumentResponse", {
+                fetch(documentResponse, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -296,7 +293,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
                   body: JSON.stringify({
                     to: specificData.phone,
                     mediaId: mediaId,
-                    phone:"573025970185",
+                    phone: botNumber,
                     type: file.type,
                   }),
                 }).then((response) => response.json())
@@ -315,9 +312,8 @@ const fileToBlob = (file: File): Promise<Blob> => {
           case "image/png":
           case "image/gif":
             // Manejo de imágenes
-            console.log("Imagen recibida");
             Promise.all([
-              fetch("http://localhost:4000/api/prisma//frontmessageImage", {
+              fetch(frontImage, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -328,14 +324,12 @@ const fileToBlob = (file: File): Promise<Blob> => {
                 .then((data) => console.log(data))
                 .catch((error) => console.error(error)),
               fetch(
-                "https://graph.facebook.com/v20.0/368124183059222/media",
+                fileMediaMeta ,
                 {
                   method: "POST",
                   headers: {
-                   // "Content-Type": "application/json",
                     Authorization:
-                      "Bearer EAAMGwDhngcsBO64ASMkKZB38QxEVFZCst93n5di0NtHZBngsXemxAOB4p7jmZBIFZAKoUgGPSHn6hYGdPf7uJaw05ZCBc4GIYgEkRqyZCzycroJ8QFOeSlP3PTrsG7jSXKoGsxL4OruPfbElIDgLNGKRBA7yoMEMbZCvrLfxPWQwrvOjQ8Qvh4ak4HmZATxKHTwTBjmntQPb5tWghwk8NtRto4YLNNh14zuwr7TooCWDZCigZDZD",
-                    // 'messaging_product': 'whatsapp'
+                      `Bearer ${metaToken}`,
                   },
                   body: formData,
                 }
@@ -346,7 +340,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
                 ).then(() => console.log("Media ID:", mediaId)
               )
                 .catch((error) => console.error(error)),
-                fetch("http://localhost:4000/api/whatsapp/sendImageResponse", {
+                fetch(imageResponse, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -354,7 +348,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
                   body: JSON.stringify({
                     to: specificData.phone,
                     mediaId: mediaId,
-                    phone:"573025970185",
+                    phone: botNumber,
                     type: file.type,
                   }),
                 }).then((response) => response.json())
@@ -374,7 +368,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
           case "video/mpeg":
             // Manejo de videos
             Promise.all([
-              fetch("http://localhost:4000/api/prisma/frontmessagevideo", {
+              fetch(frontVideo, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -385,14 +379,12 @@ const fileToBlob = (file: File): Promise<Blob> => {
                 .then((data) => console.log(data))
                 .catch((error) => console.error(error)),
               fetch(
-                "https://graph.facebook.com/v20.0/368124183059222/media",
+                fileMediaMeta,
                 {
                   method: "POST",
                   headers: {
-                   // "Content-Type": "application/json",
                     Authorization:
-                      "Bearer EAAMGwDhngcsBO64ASMkKZB38QxEVFZCst93n5di0NtHZBngsXemxAOB4p7jmZBIFZAKoUgGPSHn6hYGdPf7uJaw05ZCBc4GIYgEkRqyZCzycroJ8QFOeSlP3PTrsG7jSXKoGsxL4OruPfbElIDgLNGKRBA7yoMEMbZCvrLfxPWQwrvOjQ8Qvh4ak4HmZATxKHTwTBjmntQPb5tWghwk8NtRto4YLNNh14zuwr7TooCWDZCigZDZD",
-                    // 'messaging_product': 'whatsapp'
+                      `Bearer ${metaToken}`,
                   },
                   body: formData,
                 }
@@ -403,7 +395,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
                 ).then(() => console.log("Media ID:", mediaId)
               )
                 .catch((error) => console.error(error)),
-                fetch("http://localhost:4000/api/whatsapp/sendVideoResponse", {
+                fetch(videoResponse, {
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
@@ -411,7 +403,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
                   body: JSON.stringify({
                     to: specificData.phone,
                     mediaId: mediaId,
-                    phone:"573025970185",
+                    phone: botNumber,
                     type: file.type,
                   }),
                 }).then((response) => response.json())
@@ -444,7 +436,7 @@ const fileToBlob = (file: File): Promise<Blob> => {
       const newMessage: ChatMessages = {
         id: `${(messages?.length + 1).toString()}`,
         type: "audio",
-        message: "https://example.com/recorded-audio.mp3", // This would be the actual recorded audio URL
+        message: "https://example.com/recorded-audio.mp3", //aqui quedara la url del audio
         timestamp: new Date(),
         direction: "incoming",
         to: specificData.phone,
