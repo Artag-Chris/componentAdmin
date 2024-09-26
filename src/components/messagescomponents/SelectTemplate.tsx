@@ -6,7 +6,6 @@ import useTemplates from "../hook/useTemplates";
 import { getVariableCount } from "../functions";
 import {  cuatroVariable, cuatroVariableImagen, dosVariable, dosVariableImagen, sinVariable, sinVariableImagen, tresVariable, tresVariableImagen, unaVariable, unaVariableImagen } from "../config/envs";
 
-
 interface SendMessagesProps {
   setSelectedTemplate: (template: string) => void;
   selectedTemplate: any;

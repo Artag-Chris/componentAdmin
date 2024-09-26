@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { ImageTemplateReceived } from "../interfaces";
 import { getVariableCount, sendTemplate } from "../functions";
 import { Upload, Send,  Phone } from "lucide-react";
+import { cuatroVariableImagen, dosVariableImagen, sinVariableImagen, tresVariableImagen, unaVariableImagen } from "../config/envs";
 
 const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
   selectedTemplate,
@@ -35,9 +36,8 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
         if (!imageUrl.trim()) {
             console.error("Error: La URL de la imagen no puede estar vacía");
             return;
-          }
-        
-        sendTemplate("http://localhost:4000/api/whatsapp/sinvariableimage", payload);
+          }        
+        sendTemplate(sinVariableImagen, payload);
         
         break;
       case 1:
@@ -49,7 +49,7 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
             ...payload,
             texto: `${variableValues.variable1}`,
           };
-        sendTemplate("http://localhost:4000/api/whatsapp/unavariableimage", payload);
+        sendTemplate(unaVariableImagen, payload);
           
         break;
       case 2:
@@ -58,7 +58,7 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
             texto: `${variableValues.variable1}`,
             texto2: `${variableValues.variable2}`,
           };
-        sendTemplate("http://localhost:4000/api/whatsapp/dosvariableimage", payload);
+        sendTemplate(dosVariableImagen, payload);
         break;
       case 3:
         payload = {
@@ -67,7 +67,7 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
             texto2: `${variableValues.variable2}`,
             texto3: `${variableValues.variable3}`,
           };
-        sendTemplate("http://localhost:4000/api/whatsapp/tresvariableimage", payload);
+        sendTemplate(tresVariableImagen, payload);
         break;
       case 4:
         payload = {
@@ -77,7 +77,7 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
             texto3: `${variableValues.variable3}`,
             texto4: `${variableValues.variable4}`,
           };
-        sendTemplate("http://localhost:4000/api/whatsapp/cuatrovariableimage", payload);
+        sendTemplate(cuatroVariableImagen, payload);
         break;
       default:
         // Código para manejar otros tipos de componentes

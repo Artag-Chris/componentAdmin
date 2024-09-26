@@ -15,9 +15,6 @@ const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate,messages,i
   const [currentPage, setCurrentPage] = useState(1);
   
   const rowsPerPage = 10;
-
- 
-
   const totalPages = Math.ceil((messages.length - 1) / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage + 1;
   const endIndex = Math.min(startIndex + rowsPerPage - 1, messages.length - 1);
