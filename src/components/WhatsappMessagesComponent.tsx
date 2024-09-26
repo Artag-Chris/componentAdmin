@@ -19,15 +19,16 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
  // const [messages, setMessages] = useState([]);
 
     const handleClick = (item: User) => {
-    {
-      /*if (socket && socket.readyState === WebSocket.OPEN) {
+    { 
+      /*
+      aqui ira logica de ws para transferir usuario
+      if (socket && socket.readyState === WebSocket.OPEN) {
       
       socket.send(JSON.stringify(item.name));
     } */
     }
     onSelectUser(item);
     setSelectedUserId(item.id || null);
-    //console.log(item);
   };
  
  
