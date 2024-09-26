@@ -1,0 +1,1 @@
+export const api_user = import.meta.env.VITE_API_USER;

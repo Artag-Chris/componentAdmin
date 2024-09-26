@@ -3,8 +3,7 @@ import { ChevronLeft, ChevronRight, Upload } from "lucide-react";
 import { getVariableCount } from "../functions";
 
 interface ExcelPreviewProps {
-  // En el futuro, esto se reemplazará con los datos reales pasados como prop
-  // data: any[][]
+  
   selectedTemplate: any;
   messages: any[][];
   imageUrl:string

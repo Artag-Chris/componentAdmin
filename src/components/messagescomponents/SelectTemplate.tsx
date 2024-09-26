@@ -5,6 +5,7 @@ import usePhoneNumbers from "../hook/usePhoneNumberToSend";
 import useTemplates from "../hook/useTemplates";
 import { getVariableCount } from "../functions";
 
+
 interface SendMessagesProps {
   setSelectedTemplate: (template: string) => void;
   selectedTemplate: any;
@@ -16,14 +17,9 @@ interface SendMessagesProps {
 
 const sendMessages = async (
   messages: any,
- // templateId: any, el nombre de la plantilla
- // phoneNumber: any, //
- // additionalInfo: any  sera opcional o borrado este campo
+
+ // additionalInfo: any 
 ) => {
-  /*
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  // console.log("Messages sent:", messages, "Template ID:", templateId, "From:", phoneNumber, "Additional Info:", additionalInfo)
-  return { success: true, messagesSent: messages.length };*/
   messages.forEach((fila: any) => {
     // Aquí debes enviar un mensaje con los datos de la fila
     console.log(fila);
@@ -76,13 +72,121 @@ export default function SendMessages({
   };
 
   const handleSubmit = async () => {
-    if (!selectedTemplate || !selectedPhoneNumber || messages.length === 0)
+    if (!selectedTemplate || !selectedPhoneNumber || messages.length === 0) {
       return;
+    }
+  
     setIsLoading(true);
-    console.log("Sending messages:", messages, "Template:", selectedTemplate, "Phone:", selectedPhoneNumber, "Additional Info:", additionalInfo)
-   
-   
-    setIsLoading(false);
+  
+    try {
+      const promises = messages.map(async (fila:any, index:any) => {
+        if (index === 0) return; // Salta la primera iteración
+  
+        // Procesa la fila de datos
+        let phone = "";
+        let texto = "";
+        let texto2 = "";
+        let texto3 = "";
+        let texto4 = "";
+        let mediaId = "";
+  
+        for (const [columna, valor] of Object.entries(fila)) {
+          const indice = parseInt(columna, 10);
+          if (indice === 0) {
+            phone = valor as string;
+          } else if (indice === 1) {
+            texto = valor as string;
+          } else if (indice === 2) {
+            texto2 = valor as string;
+          } else if (indice === 3) {
+            texto3 = valor as string;
+          } else if (indice === 4) {
+            texto4 = valor as string;
+          }
+        }
+  
+        // Define la URL en función del tipo de componente
+        let url;
+        if (selectedTemplate.components[0].type === 'HEADER') {
+          switch (getVariableCount(selectedTemplate.name).variableCount) {
+            case 0:
+              url = `http://localhost:4000/api/whatsapp/sinvariableimage`;
+              break;
+            case 1:
+              url = `http://localhost:4000/api/whatsapp/unavariableimage`;
+              break;
+            case 2:
+              url = `http://localhost:4000/api/whatsapp/dosvariableimage`;
+              break;
+            case 3:
+              url = `http://localhost:4000/api/whatsapp/tresvariableimage`;
+              break;
+            case 4:
+              url = `http://localhost:4000/api/whatsapp/cuatrovariableimage`;
+              break;
+            default:
+              // Código para manejar otros tipos de componentes
+              break;
+          }
+        } else {
+          switch (getVariableCount(selectedTemplate.name).variableCount) {
+            case 0:
+              url = `http://localhost:4000/api/whatsapp/sinvariable`;
+              break;
+            case 1:
+              url = `http://localhost:4000/api/whatsapp/unavariable`;
+              break;
+            case 2:
+              url = `http://localhost:4000/api/whatsapp/dosvariable`;
+              break;
+            case 3:
+              url = `http://localhost:4000/api/whatsapp/tresvariable`;
+              break;
+            case 4:
+              url = `http://localhost:4000/api/whatsapp/cuatrovariable`;
+              break;
+            default:
+              // Código para manejar otros tipos de componentes
+              break;
+          }
+        }
+  
+        // Envía la solicitud
+        const token = Math.random().toString(36).substr(2, 9);
+        const payload = {
+          template: selectedTemplate.name,
+          mediaId: imageUrl,
+          phone: phone,
+          texto: texto,
+          texto2: texto2,
+          texto3: texto3,
+          texto4: texto4,
+        };
+  
+        // Envía la solicitud
+        const response = await fetch(`${url}?token=${token}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        // Procesa la respuesta
+        if (!response.ok) {
+          throw new Error("Error al enviar el mensaje");
+        }
+        console.log("Respuesta:", response.statusText);
+        return response.json();
+      });
+  
+      // Espera a que todas las solicitudes se completen
+      await Promise.all(promises);
+    } catch (error) {
+      console.error("Error al enviar los mensajes", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

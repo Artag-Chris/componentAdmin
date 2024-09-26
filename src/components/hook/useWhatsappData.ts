@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { FetchDatafromAPIClass } from '../interfaces/fetchUsersData';
+import { api_user } from '../config/envs';
 
 export const useWhatsappData = () => {
   const [data, setData] = useState<any[]>([]);
@@ -17,7 +18,8 @@ export const useWhatsappData = () => {
       setLoading(false);
     } else {
       try {
-        const response = await axios.get<FetchDatafromAPIClass[]>('http://localhost:4000/api/prisma/users');
+      
+        const response = await axios.get<FetchDatafromAPIClass[]>(api_user);
         const uniqueData = Array.from(new Set(response.data.map(item => item.phone)));
       
         setData((prevData) => [...prevData, ...uniqueData]);
