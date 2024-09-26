@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { BodyTemplateReceived } from "../interfaces";
 import { getVariableCount, sendTemplate } from "../functions";
 import { Send, Phone } from "lucide-react";
-import { text } from "stream/consumers";
+import { cuatroVariable, dosVariable, sinVariable, tresVariable, unaVariable } from "../config/envs";
 
 const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
   selectedTemplate,
@@ -33,7 +33,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
 
     switch (getVariableCount(selectedTemplate.name).variableCount) {
       case 0:
-        sendTemplate("http://localhost:4000/api/whatsapp/sinvariable", payload);
+        sendTemplate(sinVariable, payload);
 
         break;
       case 1:
@@ -41,7 +41,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
           ...payload,
           texto: `${variableValues.variable1}`,
         };
-        sendTemplate("http://localhost:4000/api/whatsapp/unavariable", payload);
+        sendTemplate(unaVariable, payload);
 
         break;
       case 2:
@@ -50,7 +50,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
           texto: `${variableValues.variable1}`,
           texto2: `${variableValues.variable2}`,
         };
-        sendTemplate("http://localhost:4000/api/whatsapp/dosvariable", payload);
+        sendTemplate(dosVariable, payload);
         break;
       case 3:
         payload = {
@@ -59,10 +59,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
           texto2: `${variableValues.variable2}`,
           texto3: `${variableValues.variable3}`,
         };
-        sendTemplate(
-          "http://localhost:4000/api/whatsapp/tresvariable",
-          payload
-        );
+        sendTemplate( tresVariable,payload );
         break;
       case 4:
         payload = {
@@ -72,10 +69,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
           texto3: `${variableValues.variable3}`,
           texto4: `${variableValues.variable4}`,
         };
-        sendTemplate(
-          "http://localhost:4000/api/whatsapp/cuatrovariable",
-          payload
-        );
+        sendTemplate( cuatroVariable, payload );
         break;
       default:
         // Código para manejar otros tipos de componentes
