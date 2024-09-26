@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import usePhoneNumbers from "../hook/usePhoneNumberToSend";
 import useTemplates from "../hook/useTemplates";
 import { getVariableCount } from "../functions";
+import {  cuatroVariable, cuatroVariableImagen, dosVariable, dosVariableImagen, sinVariable, sinVariableImagen, tresVariable, tresVariableImagen, unaVariable, unaVariableImagen } from "../config/envs";
 
 
 interface SendMessagesProps {
@@ -18,7 +19,6 @@ interface SendMessagesProps {
 const sendMessages = async (
   messages: any,
 
- // additionalInfo: any 
 ) => {
   messages.forEach((fila: any) => {
     // Aquí debes enviar un mensaje con los datos de la fila
@@ -88,7 +88,6 @@ export default function SendMessages({
         let texto2 = "";
         let texto3 = "";
         let texto4 = "";
-        let mediaId = "";
   
         for (const [columna, valor] of Object.entries(fila)) {
           const indice = parseInt(columna, 10);
@@ -110,19 +109,19 @@ export default function SendMessages({
         if (selectedTemplate.components[0].type === 'HEADER') {
           switch (getVariableCount(selectedTemplate.name).variableCount) {
             case 0:
-              url = `http://localhost:4000/api/whatsapp/sinvariableimage`;
+              url = sinVariableImagen;
               break;
             case 1:
-              url = `http://localhost:4000/api/whatsapp/unavariableimage`;
+              url = unaVariableImagen;
               break;
             case 2:
-              url = `http://localhost:4000/api/whatsapp/dosvariableimage`;
+              url = dosVariableImagen;
               break;
             case 3:
-              url = `http://localhost:4000/api/whatsapp/tresvariableimage`;
+              url = tresVariableImagen;
               break;
             case 4:
-              url = `http://localhost:4000/api/whatsapp/cuatrovariableimage`;
+              url = cuatroVariableImagen;
               break;
             default:
               // Código para manejar otros tipos de componentes
@@ -131,19 +130,19 @@ export default function SendMessages({
         } else {
           switch (getVariableCount(selectedTemplate.name).variableCount) {
             case 0:
-              url = `http://localhost:4000/api/whatsapp/sinvariable`;
+              url = sinVariable;
               break;
             case 1:
-              url = `http://localhost:4000/api/whatsapp/unavariable`;
+              url = unaVariable;
               break;
             case 2:
-              url = `http://localhost:4000/api/whatsapp/dosvariable`;
+              url = dosVariable;
               break;
             case 3:
-              url = `http://localhost:4000/api/whatsapp/tresvariable`;
+              url = tresVariable;
               break;
             case 4:
-              url = `http://localhost:4000/api/whatsapp/cuatrovariable`;
+              url = cuatroVariable;
               break;
             default:
               // Código para manejar otros tipos de componentes
@@ -163,7 +162,7 @@ export default function SendMessages({
           texto4: texto4,
         };
   
-        // Envía la solicitud
+        // Envía la solicitud evita la petición doble
         const response = await fetch(`${url}?token=${token}`, {
           method: "POST",
           headers: {
@@ -288,13 +287,11 @@ export default function SendMessages({
                   >
                     Seleciona un archivo de excel
                     <input
-                    
                       id="file-upload"
                       type="file"
                       accept=".xlsx, .xls"
                       onChange={handleFileUpload}
-                      className="hidden"
-                      
+                      className="hidden"  
                     />
                   </label>
                   {file && (
