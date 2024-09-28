@@ -1,62 +1,38 @@
-import React, { useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faEnvelope, faComment } from '@fortawesome/free-solid-svg-icons';
+import React from 'react';
+import { Home, Mail, Settings } from 'lucide-react';
+
 
 interface SidebarProps {
   className?: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ className }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
+  const menuItems = [
+    { icon: Home, text: 'Home', href: '/' },
+    { icon: Mail, text: 'Send Messages', href: '/SendMessages' },
+    { icon: Settings, text: 'Settings', href: '/settings' },
+  ];
 
   return (
-    <>
-      <button
-        className="block md:hidden text-gray-800 p-4 focus:outline-none"
-        onClick={toggleSidebar}
-      >
-        <svg
-          className="h-6 w-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 6h16M4 12h16m-7 6h7"
-          ></path>
-        </svg>
-      </button>
-      <aside
-        className={`bg-white text-black p-4 h-full md:block ${isOpen ? 'block' : 'hidden'} ${className}`}
-      >
-        <h1 className="text-2xl font-bold">Sidebar</h1>
-        <ul className="mt-4">
-          <a href="/" className="block">
-            <li className="p-4 hover:bg-gray-200 flex items-center rounded-md">
-              <FontAwesomeIcon icon={faComment} className="h-6 w-6 mr-2" /> Home
-            </li>
-          </a>
-          <a href="/SendMessages" className="block">
-            <li className="p-4 hover:bg-gray-200 flex items-center rounded-md">
-              <FontAwesomeIcon icon={faEnvelope} className="h-6 w-6 mr-2" /> Send Messages
-            </li>
-          </a>
-          <a href="/item3" className="block">
-            <li className="p-4 hover:bg-gray-200 flex items-center rounded-md">
-              <FontAwesomeIcon icon={faCog} className="h-6 w-6 mr-2" /> Item 3
-            </li>
-          </a>
-        </ul>
-      </aside>
-    </>
+    <aside className={className}>
+      <div className="p-5">
+        <h2 className="text-2xl font-bold text-purple-600 mb-8">Menu</h2>
+        <nav>
+          <ul className="space-y-2">
+            {menuItems.map((item, index) => (
+              <li key={index}>
+                <a href={item.href}>
+                  <a className="flex items-center p-3 text-gray-700 rounded-lg hover:bg-purple-100 transition-all duration-200 group">
+                    <item.icon className="w-6 h-6 text-gray-500 group-hover:text-purple-600 transition-colors duration-200" />
+                    <span className="ml-3 font-medium group-hover:text-purple-600 transition-colors duration-200">{item.text}</span>
+                  </a>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </aside>
   );
 };
 
