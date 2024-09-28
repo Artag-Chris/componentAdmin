@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { getTemplates } from '../config/envs';
 
 interface UseTemplatesResponse {
   templates: any[];
@@ -14,7 +15,7 @@ const useTemplates = (): UseTemplatesResponse => {
 
   const fetchTemplates = async (): Promise<void> => {
     try {
-      const response = await fetch('http://localhost:4000/api/whatsapp/getTemplates');
+      const response = await fetch(getTemplates);
       const data = await response.json();
       setTemplates(data);
       setLoading(false);

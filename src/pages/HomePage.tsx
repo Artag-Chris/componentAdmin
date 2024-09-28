@@ -7,7 +7,7 @@ import ChatWhatsappComponent from "../components/ChatWhatsappComponent";
 
 const HomePage = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const { loading, error, } = useWhatsappData();
+    const { data,loading, error, } = useWhatsappData();
    
 
     const handleSelectUser = (user: User) => {

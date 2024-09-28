@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getPhoneNumber } from '../config/envs';
 
 interface UsePhoneNumbersResponse {
   phoneNumbers: any[];
@@ -17,7 +18,7 @@ const usePhoneNumbers = (): UsePhoneNumbersResponse => {
 
   const fetchPhoneNumbers = async (): Promise<void> => {
     try {
-      const response = await fetch('http://localhost:4000/api/whatsapp/getphones');
+      const response = await fetch(getPhoneNumber);
       if (!response.ok) {
         throw new Error('Error al obtener los números de teléfono');
       }

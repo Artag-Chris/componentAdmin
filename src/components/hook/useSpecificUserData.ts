@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { WhatsappAudio, WhatsappDoc, WhatsappImage, WhatsappMessage, WhatsappVideo } from '../interfaces';
+import { getBotMessages, getCustomerMessages } from '../config/envs';
 
 
 interface Message{
@@ -30,8 +31,8 @@ const useSpecificData = (id?: string | null) => {
 
     try {
       const responses = await Promise.all([
-        axios.get<Message[]>(`http://localhost:4000/api/prisma/deepSearchForAllMessages/${id}`),
-        axios.get<Message[]>(`http://localhost:4000/api/prisma/searchForBotMessages/${id}`),
+        axios.get<Message[]>(`${getCustomerMessages}/${id}`),
+        axios.get<Message[]>(`${getBotMessages}/${id}`),
       ]);
      //combino los datos para renderizarlos como uno solo
       const mergedData = {
