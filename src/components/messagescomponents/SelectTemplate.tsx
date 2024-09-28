@@ -4,6 +4,8 @@ import * as XLSX from "xlsx";
 import usePhoneNumbers from "../hook/usePhoneNumberToSend";
 import useTemplates from "../hook/useTemplates";
 import { getVariableCount } from "../functions";
+import TetrisLoader from "../../loaders/TetrisLoader";
+
 
 interface SendMessagesProps {
   setSelectedTemplate: (template: any) => void;
@@ -28,6 +30,7 @@ export default function SendMessages({
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState("");
   const [file, setFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingComponent, setIsLoadingComponent] = useState(true)
   const [result, setResult] = useState<{
     success: boolean;
     messagesSent: any;
@@ -83,6 +86,16 @@ export default function SendMessages({
     }
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoadingComponent(false)
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [])
+   
+  if (isLoadingComponent) {
+    return <TetrisLoader />;
+  }
   return (
     <div className="container mx-auto p-4 max-w-md">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">

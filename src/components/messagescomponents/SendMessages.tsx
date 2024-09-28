@@ -21,7 +21,9 @@ export const SendMessagesTemplate: React.FC<SendMessagesTemplateProps> = ({ sele
       <ExcelPreview selectedTemplate={selectedTemplate} messages={messages} setImageUrl={setImageUrl}  imageUrl={imageUrl} />
     </div>;
   }
-
+//en header se debera hacer otra comprobacion para ver si es imagen,pdf,o video
+//se debera crear un componente para cada uno de estos
+//se mandaran a distintas urls dependiendo el numero de variables que contenga
   return (
     <div>
       {selectedTemplate.components[0].type === 'HEADER' && (
