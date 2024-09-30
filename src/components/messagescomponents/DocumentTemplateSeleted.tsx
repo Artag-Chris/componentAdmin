@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 //import { PDFTemplateReceived } from "../interfaces";
 import { getVariableCount, sendTemplate } from "../functions";
 import { Upload, Send, Phone, FileText } from "lucide-react";
+import { fileToBlob } from "../functions/fileToBlob";
+import { removeBase64Prefix } from "../functions/removeBase64Prefix";
+import { fileMediaMeta, metaToken } from "../config/envs";
 //import { cuatroVariablePDF, dosVariablePDF, sinVariablePDF, tresVariablePDF, unaVariablePDF } from "../config/envs";
 
 const DocumentTemplateSelected: React.FC<any> = ({
@@ -24,13 +27,12 @@ const DocumentTemplateSelected: React.FC<any> = ({
       alert("Por favor, selecciona un archivo PDF válido.");
     }
   };
-
   const handleSendTemplate = async () => {
     if (!pdfFile) {
       alert("Por favor, selecciona un archivo PDF antes de enviar.");
       return;
     }
-
+  
     interface Payload {
       phone: string;
       pdfFile: File;
@@ -39,60 +41,86 @@ const DocumentTemplateSelected: React.FC<any> = ({
       texto3?: string;
       texto4?: string;
     }
-
+  
     let payload: Payload = {
       phone: phoneNumber,
       pdfFile: pdfFile,
     };
-
-    switch (getVariableCount(selectedTemplate.name).variableCount) {
-      case 0:
-        console.log("No hay variables");
-       // await sendTemplate(sinVariablePDF, payload);
-        break;
-      case 1:
-        payload = {
-          ...payload,
-          texto: variableValues.variable1,
-        };
-        console.log("Una variable");
-       // await sendTemplate(unaVariablePDF, payload);
-        break;
-      case 2:
-        payload = {
-          ...payload,
-          texto: variableValues.variable1,
-          texto2: variableValues.variable2,
-        };
-        console.log("Dos variables");
-       // await sendTemplate(dosVariablePDF, payload);
-        break;
-      case 3:
-        payload = {
-          ...payload,
-          texto: variableValues.variable1,
-          texto2: variableValues.variable2,
-          texto3: variableValues.variable3,
-        };
-        console.log("Tres variables");
-       // await sendTemplate(tresVariablePDF, payload);
-        break;
-      case 4:
-        payload = {
-          ...payload,
-          texto: variableValues.variable1,
-          texto2: variableValues.variable2,
-          texto3: variableValues.variable3,
-          texto4: variableValues.variable4,
-        };
-        console.log("Cuatro variables");
-       // await sendTemplate(cuatroVariablePDF, payload);
-        break;
-      default:
-        console.error("Número de variables no soportado");
-        break;
-    }
+  
+    const file = pdfFile;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const blob = await fileToBlob(file);
+      const formData = new FormData();
+      formData.append("messaging_product", "whatsapp");
+      formData.append("file", blob);
+      formData.append("type", file.type);
+  
+      // ... resto de la lógica de la función ...
+  
+      switch (getVariableCount(selectedTemplate.name).variableCount) {
+        case 0:
+          console.log("No hay variables");
+          // await sendTemplate(sinVariablePDF, payload);
+          break;
+        case 1:
+          payload = {
+            ...payload,
+            texto: variableValues.variable1,
+          };
+          console.log("Una variable");
+          // await sendTemplate(unaVariablePDF, payload);
+          break;
+        case 2:
+          payload = {
+            ...payload,
+            texto: variableValues.variable1,
+            texto2: variableValues.variable2,
+          };
+          console.log("Dos variables");
+          // await sendTemplate(dosVariablePDF, payload);
+          break;
+        case 3:
+          payload = {
+            ...payload,
+            texto: variableValues.variable1,
+            texto2: variableValues.variable2,
+            texto3: variableValues.variable3,
+          };
+          console.log("Tres variables");
+          // await sendTemplate(tresVariablePDF, payload);
+          break;
+        case 4:
+          payload = {
+            ...payload,
+            texto: variableValues.variable1,
+            texto2: variableValues.variable2,
+            texto3: variableValues.variable3,
+            texto4: variableValues.variable4,
+          };
+          console.log("Cuatro variables");
+          // await sendTemplate(cuatroVariablePDF, payload);
+          break;
+        default:
+          console.error("Número de variables no soportado");
+          break;
+      }
+  
+      // Envía la solicitud con el formData
+      fetch(fileMediaMeta, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${metaToken}`,
+        },
+        body: formData,
+      })
+        .then((response) => console.log("Archivo subido con éxito"))
+        .catch((error) => console.error("Error al subir el archivo:", error));
+    };
+    reader.readAsDataURL(file);
   };
+
+  
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
