@@ -17,6 +17,12 @@ export const dosVariableImagen = import.meta.env.VITE_TEMPLATE_DOSVARIABLE_IMAGE
 export const tresVariableImagen = import.meta.env.VITE_TEMPLATE_TRESVARIABLE_IMAGEN
 export const cuatroVariableImagen = import.meta.env.VITE_TEMPLATE_CUATROVARIABLE_IMAGEN
 
+export const sinVariableDocument = import.meta.env.VITE_TEMPLATE_SINVARIABLE_DOCUMENT
+export const unaVariableDocument = import.meta.env.VITE_TEMPLATE_UNAVARIABLE_DOCUMENT
+export const dosVariableDocument = import.meta.env.VITE_TEMPLATE_DOSVARIABLE_DOCUMENT
+export const tresVariableDocument = import.meta.env.VITE_TEMPLATE_TRESVARIABLE_DOCUMENT
+export const cuatroVariableDocument = import.meta.env.VITE_TEMPLATE_CUATROVARIABLE_DOCUMENT
+
 export const sinVariable = import.meta.env.VITE_TEMPLATE_SINVARIABLE
 export const unaVariable = import.meta.env.VITE_TEMPLATE_UNAVARIABLE
 export const dosVariable = import.meta.env.VITE_TEMPLATE_DOSVARIABLE
