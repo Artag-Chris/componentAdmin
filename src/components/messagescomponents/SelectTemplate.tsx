@@ -103,7 +103,7 @@ export default function SendMessages({
           <h2 className="text-2xl font-bold text-white">Envío de plantillas</h2>
         </div>
         <div className="p-6 space-y-4">
-          {/* Phone Number Dropdown */}
+         
           <div className="space-y-2">
             <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
               Selecciona un número del cual enviar
