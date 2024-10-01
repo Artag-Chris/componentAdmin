@@ -9,7 +9,7 @@ export default function TemplatesPage() {
   const [messages, setMessages] = useState<any[][]>([]);
   const [imageUrl, setImageUrl] = useState("");
   const [documentUrl, setDocumentUrl] = useState("");
-
+  const [videoUrl, setVideoUrl] = useState("");
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -24,6 +24,7 @@ export default function TemplatesPage() {
               messages={messages}
               imageUrl={imageUrl}
               documentUrl={documentUrl}
+              videoUrl={videoUrl}
             />
           </div>
         </div>
@@ -33,6 +34,7 @@ export default function TemplatesPage() {
               <SendMessagesTemplate selectedTemplate={selectedTemplate} isExcelFileLoaded={isExcelFileLoaded} 
                setImageUrl={setImageUrl} messages={messages}  imageUrl={imageUrl}
                setDocumentUrl={setDocumentUrl} documentUrl={documentUrl}
+               setVideoUrl={setVideoUrl} videoUrl={videoUrl}
               />
             </div>
           ) : (

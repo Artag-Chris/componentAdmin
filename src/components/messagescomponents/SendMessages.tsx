@@ -14,23 +14,25 @@ type SendMessagesTemplateProps = {
   imageUrl: string;
   documentUrl: string;
   setDocumentUrl: (documentUrl: string) => void;
+  videoUrl: string;
+  setVideoUrl: (videoUrl: string) => void;
 };
 
 export const SendMessagesTemplate: React.FC<SendMessagesTemplateProps> = ({ selectedTemplate,
-   isExcelFileLoaded, messages,setImageUrl,  imageUrl, documentUrl, setDocumentUrl}) => {
+   isExcelFileLoaded, messages,setImageUrl,  imageUrl, documentUrl, setDocumentUrl
+  , videoUrl, setVideoUrl}) => {
  
 
   if (isExcelFileLoaded) {
     // Si se ha cargado un documento de Excel, no se puede acceder a los componentes
     return <div>
       <ExcelPreview selectedTemplate={selectedTemplate} messages={messages} setImageUrl={setImageUrl}  imageUrl={imageUrl}
-      setDocumentUrl={setDocumentUrl} documentUrl={documentUrl} />
+      setDocumentUrl={setDocumentUrl} documentUrl={documentUrl}
+      videoUrl={videoUrl} setVideoUrl={setVideoUrl} />
     </div>;
   }
  
-//en header se debera hacer otra comprobacion para ver si es imagen,pdf,o video
-//se debera crear un componente para cada uno de estos
-//se mandaran a distintas urls dependiendo el numero de variables que contenga
+
   return (
     <div>
       {selectedTemplate.components[0].type === 'HEADER' && (

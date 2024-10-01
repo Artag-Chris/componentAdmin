@@ -5,6 +5,7 @@ import usePhoneNumbers from "../hook/usePhoneNumberToSend";
 import useTemplates from "../hook/useTemplates";
 import { getVariableCount } from "../functions";
 import TetrisLoader from "../../loaders/TetrisLoader";
+import { sinVariableImagen, unaVariableImagen, dosVariableImagen, tresVariableImagen, cuatroVariableImagen, sinVariable, unaVariable, dosVariable, tresVariable, cuatroVariable, sinVariableDocument, cuatroVariableDocument, dosVariableDocument, tresVariableDocument, unaVariableDocument } from "../config/envs";
 
 
 interface SendMessagesProps {
@@ -13,8 +14,9 @@ interface SendMessagesProps {
   setIsExcelFileLoaded: (isExcelFileLoaded: boolean) => void;
   setMessages: (messages: any) => void;
   messages: any;
-  imageUrl: string;
-  documentUrl: string
+  imageUrl?: string;
+  documentUrl?: string
+  videoUrl?: string
 }
 
 export default function SendMessages({
@@ -24,7 +26,8 @@ export default function SendMessages({
   setMessages,
   messages,
   imageUrl,
-  documentUrl
+  documentUrl,
+  videoUrl
 }: SendMessagesProps) {
   const { templates, error, loading } = useTemplates();
   const { phoneNumbers } = usePhoneNumbers();
@@ -79,25 +82,165 @@ export default function SendMessages({
     setIsLoading(true);
   
     try {
-      // Implementación del envío de mensajes (sin cambios)
-      // ...
+      const promises = messages.map(async (fila: any, index: any) => {
+        if (index === 0) return; // Salta la primera iteración
+  
+        // Procesa la fila de datos
+        let phone = "";
+        let texto = "";
+        let texto2 = "";
+        let texto3 = "";
+        let texto4 = "";
+  
+        for (const [columna, valor] of Object.entries(fila)) {
+          const indice = parseInt(columna, 10);
+          if (indice === 0) {
+            phone = valor as string;
+          } else if (indice === 1) {
+            texto = valor as string;
+          } else if (indice === 2) {
+            texto2 = valor as string;
+          } else if (indice === 3) {
+            texto3 = valor as string;
+          } else if (indice === 4) {
+            texto4 = valor as string;
+          }
+        }
+  
+        // Define la URL en función del tipo de componente
+        let url;
+        if (selectedTemplate.components[0].type === 'HEADER') {
+          switch (selectedTemplate.components[0].format) {
+            case 'IMAGE':
+              switch (getVariableCount(selectedTemplate.name).variableCount) {
+                case 0:
+                  url = sinVariableImagen;
+                  break;
+                case 1:
+                  url = unaVariableImagen;
+                  break;
+                case 2:
+                  url = dosVariableImagen;
+                  break;
+                case 3:
+                  url = tresVariableImagen;
+                  break;
+                case 4:
+                  url = cuatroVariableImagen;
+                  break;
+                default:
+                  // Código para manejar otros tipos de componentes
+                  break;
+              }
+              break;
+            case 'VIDEO':
+              switch (getVariableCount(selectedTemplate.name).variableCount) {
+                case 0:
+            //      url = sinVariableVideo;
+                  break;
+                case 1:
+            //      url = unaVariableVideo;
+                  break;
+                case 2:
+            //      url = dosVariableVideo;
+                  break;
+                case 3:
+            //      url = tresVariableVideo;
+                  break;
+                case 4:
+            //      url = cuatroVariableVideo;
+                  break;
+                default:
+                  // Código para manejar otros tipos de componentes
+                  break;
+              }
+              break;
+            case 'DOCUMENT':
+              switch (getVariableCount(selectedTemplate.name).variableCount) {
+                case 0:
+                  url = sinVariableDocument;
+                  break;
+                case 1:
+                  url = unaVariableDocument;
+                  break;
+                case 2:
+                  url = dosVariableDocument;
+                  break;
+                case 3:
+                  url = tresVariableDocument;
+                  break;
+                case 4:
+                  url = cuatroVariableDocument;
+                  break;
+                default:
+                  // Código para manejar otros tipos de componentes
+                  break;
+              }
+              break;
+            default:
+              // Código para manejar otros tipos de componentes
+              break;
+          }
+        } else {
+          switch (getVariableCount(selectedTemplate.name).variableCount) {
+            case 0:
+              url = sinVariable;
+              break;
+            case 1:
+              url = unaVariable;
+              break;
+            case 2:
+              url = dosVariable;
+              break;
+            case 3:
+              url = tresVariable;
+              break;
+            case 4:
+              url = cuatroVariable;
+              break;
+            default:
+              // Código para manejar otros tipos de componentes
+              break;
+          }
+        }
+  
+        // Envía la solicitud
+        const token = Math.random().toString(36).substr(2, 9);
+        const payload = {
+          template: selectedTemplate.name,
+          mediaId: selectedTemplate.components[0].format === 'IMAGE' ? imageUrl : selectedTemplate.components[0].format === 'VIDEO' ? videoUrl : documentUrl,
+          phone: phone,
+          texto: texto,
+          texto2: texto2,
+          texto3: texto3,
+          texto4: texto4,
+        };
+  
+        // Envía la solicitud evita la petición doble
+        const response = await fetch(`${url}?token=${token}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        // Procesa la respuesta
+        if (!response.ok) {
+          throw new Error("Error al enviar el mensaje");
+        }
+        console.log("Respuesta:", response.statusText);
+        return response.json();
+      });
+  
+      // Espera a que todas las solicitudes se completen
+      await Promise.all(promises);
     } catch (error) {
       console.error("Error al enviar los mensajes", error);
     } finally {
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoadingComponent(false)
-    }, 2000)
-    return () => clearTimeout(timer)
-  }, [])
-   
-  if (isLoadingComponent) {
-    return <TetrisLoader />;
-  }
   return (
     <div className="container mx-auto p-4 max-w-md">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">

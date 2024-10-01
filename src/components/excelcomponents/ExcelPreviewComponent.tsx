@@ -10,9 +10,12 @@ interface ExcelPreviewProps {
   setImageUrl: (imageUrl: string) => void;
   documentUrl: string
   setDocumentUrl: (documentUrl: string) => void
+  videoUrl: string
+  setVideoUrl: (videoUrl: string) => void
 }
 
-const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate, messages, imageUrl, setImageUrl }) => {
+const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate, messages, imageUrl,
+  setDocumentUrl, documentUrl, videoUrl, setVideoUrl, setImageUrl }) => {
   const [variables, setVariables] = useState<any>();
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -66,8 +69,8 @@ const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate, messages,
                 <h3>Con Video</h3>
                 <input
                   type="text"
-                  // value={videoUrl}
-                  // onChange={(e) => setVideoUrl(e.target.value)}
+                   value={videoUrl}
+                   onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="Sube la URL del video"
                   className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
@@ -77,8 +80,8 @@ const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate, messages,
                 <h3>Con Documento</h3>
                 <input
                   type="text"
-                  // value={documentUrl}
-                  // onChange={(e) => setDocumentUrl(e.target.value)}
+                   value={documentUrl}
+                   onChange={(e) => setDocumentUrl(e.target.value)}
                   placeholder="Sube la URL del documento"
                   className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
