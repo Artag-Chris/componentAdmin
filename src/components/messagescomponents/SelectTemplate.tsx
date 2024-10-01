@@ -5,7 +5,7 @@ import usePhoneNumbers from "../hook/usePhoneNumberToSend";
 import useTemplates from "../hook/useTemplates";
 import { getVariableCount } from "../functions";
 import TetrisLoader from "../../loaders/TetrisLoader";
-import { sinVariableImagen, unaVariableImagen, dosVariableImagen, tresVariableImagen, cuatroVariableImagen, sinVariable, unaVariable, dosVariable, tresVariable, cuatroVariable, sinVariableDocument, cuatroVariableDocument, dosVariableDocument, tresVariableDocument, unaVariableDocument } from "../config/envs";
+import { sinVariableImagen, unaVariableImagen, dosVariableImagen, tresVariableImagen, cuatroVariableImagen, sinVariable, unaVariable, dosVariable, tresVariable, cuatroVariable, sinVariableDocument, cuatroVariableDocument, dosVariableDocument, tresVariableDocument, unaVariableDocument, cuatroVariableVideo, dosVariableVideo, sinVariableVideo, tresVariableVideo, unaVariableVideo } from "../config/envs";
 
 
 interface SendMessagesProps {
@@ -136,19 +136,19 @@ export default function SendMessages({
             case 'VIDEO':
               switch (getVariableCount(selectedTemplate.name).variableCount) {
                 case 0:
-            //      url = sinVariableVideo;
+                  url = sinVariableVideo;
                   break;
                 case 1:
-            //      url = unaVariableVideo;
+                  url = unaVariableVideo;
                   break;
                 case 2:
-            //      url = dosVariableVideo;
+                  url = dosVariableVideo;
                   break;
                 case 3:
-            //      url = tresVariableVideo;
+                 url = tresVariableVideo;
                   break;
                 case 4:
-            //      url = cuatroVariableVideo;
+                  url = cuatroVariableVideo;
                   break;
                 default:
                   // Código para manejar otros tipos de componentes
@@ -241,6 +241,7 @@ export default function SendMessages({
       setIsLoading(false);
     }
   };
+  
   return (
     <div className="container mx-auto p-4 max-w-md">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">

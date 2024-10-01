@@ -23,6 +23,13 @@ export const dosVariableDocument = import.meta.env.VITE_TEMPLATE_DOSVARIABLE_DOC
 export const tresVariableDocument = import.meta.env.VITE_TEMPLATE_TRESVARIABLE_DOCUMENT
 export const cuatroVariableDocument = import.meta.env.VITE_TEMPLATE_CUATROVARIABLE_DOCUMENT
 
+export const sinVariableVideo = import.meta.env.VITE_TEMPLATE_SINVARIABLE_VIDEO 
+export const unaVariableVideo = import.meta.env.VITE_TEMPLATE_UNAVARIABLE_VIDEO  
+export const dosVariableVideo = import.meta.env.VITE_TEMPLATE_DOSVARIABLE_VIDEO 
+export const tresVariableVideo = import.meta.env.VITE_TEMPLATE_TRESVARIABLE_VIDEO
+export const cuatroVariableVideo = import.meta.env.VITE_TEMPLATE_CUATROVARIABLE_VIDEO
+
+
 export const sinVariable = import.meta.env.VITE_TEMPLATE_SINVARIABLE
 export const unaVariable = import.meta.env.VITE_TEMPLATE_UNAVARIABLE
 export const dosVariable = import.meta.env.VITE_TEMPLATE_DOSVARIABLE
