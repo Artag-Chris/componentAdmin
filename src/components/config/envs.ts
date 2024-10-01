@@ -1,4 +1,5 @@
 export const api_user = import.meta.env.VITE_URL_USERS;
+export const url_base = import.meta.env.VITE_URL_BASE
 export const frontMessage = import.meta.env.VITE_FRONT_MESSAGE;
 export const frontDocument = import.meta.env.VITE_FRONT_DOCUMENT
 export const frontImage = import.meta.env.VITE_FRONT_IMAGE

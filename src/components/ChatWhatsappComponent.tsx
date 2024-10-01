@@ -8,7 +8,7 @@ import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 import { ImageMessage, VideoMessage, VoiceMessage, DocumentMessage } from "./chatcomponents";
-import { botNumber, documentResponse, fileMediaMeta, frontDocument, frontImage, frontMessage, frontVideo, imageResponse, metaToken, textResponse, videoResponse } from "./config/envs";
+import { botNumber, documentResponse, fileMediaMeta, frontDocument, frontImage, frontMessage, frontVideo, imageResponse, metaToken, textResponse, url_base, videoResponse } from "./config/envs";
 import TetrisLoader from "../loaders/TetrisLoader";
 
 interface Props {
@@ -76,7 +76,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   }, [isRecording]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4000/ws");
+    const ws = new WebSocket(`ws:${url_base}/ws`);
 
     ws.onopen = () => {
       console.log("Conectado al servidor WebSocket");
@@ -97,7 +97,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
 
     const reconnectWebSocket = () => {
       setTimeout(() => {
-        const ws = new WebSocket("ws://localhost:4000/ws");
+        const ws = new WebSocket(`ws:${url_base}/ws`);
         ws.onopen = () => {
           console.log("Reconectado al servidor WebSocket");
         };
