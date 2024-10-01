@@ -8,6 +8,7 @@ export default function TemplatesPage() {
   const [isExcelFileLoaded, setIsExcelFileLoaded] = useState(false);
   const [messages, setMessages] = useState<any[][]>([]);
   const [imageUrl, setImageUrl] = useState("");
+  const [documentUrl, setDocumentUrl] = useState("");
 
 
   return (
@@ -22,7 +23,7 @@ export default function TemplatesPage() {
               setMessages={setMessages}
               messages={messages}
               imageUrl={imageUrl}
-             
+              documentUrl={documentUrl}
             />
           </div>
         </div>
@@ -31,6 +32,7 @@ export default function TemplatesPage() {
             <div className="bg-white rounded-lg shadow-lg p-6">
               <SendMessagesTemplate selectedTemplate={selectedTemplate} isExcelFileLoaded={isExcelFileLoaded} 
                setImageUrl={setImageUrl} messages={messages}  imageUrl={imageUrl}
+               setDocumentUrl={setDocumentUrl} documentUrl={documentUrl}
               />
             </div>
           ) : (

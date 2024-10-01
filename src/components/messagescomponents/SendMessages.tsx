@@ -12,16 +12,19 @@ type SendMessagesTemplateProps = {
   messages: any[][];
   setImageUrl: (imageUrl: string) => void;
   imageUrl: string;
+  documentUrl: string;
+  setDocumentUrl: (documentUrl: string) => void;
 };
 
 export const SendMessagesTemplate: React.FC<SendMessagesTemplateProps> = ({ selectedTemplate,
-   isExcelFileLoaded, messages,setImageUrl,  imageUrl}) => {
+   isExcelFileLoaded, messages,setImageUrl,  imageUrl, documentUrl, setDocumentUrl}) => {
  
 
   if (isExcelFileLoaded) {
     // Si se ha cargado un documento de Excel, no se puede acceder a los componentes
     return <div>
-      <ExcelPreview selectedTemplate={selectedTemplate} messages={messages} setImageUrl={setImageUrl}  imageUrl={imageUrl} />
+      <ExcelPreview selectedTemplate={selectedTemplate} messages={messages} setImageUrl={setImageUrl}  imageUrl={imageUrl}
+      setDocumentUrl={setDocumentUrl} documentUrl={documentUrl} />
     </div>;
   }
  

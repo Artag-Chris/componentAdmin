@@ -14,6 +14,7 @@ interface SendMessagesProps {
   setMessages: (messages: any) => void;
   messages: any;
   imageUrl: string;
+  documentUrl: string
 }
 
 export default function SendMessages({
@@ -22,7 +23,8 @@ export default function SendMessages({
   setIsExcelFileLoaded,
   setMessages,
   messages,
-  imageUrl
+  imageUrl,
+  documentUrl
 }: SendMessagesProps) {
   const { templates, error, loading } = useTemplates();
   const { phoneNumbers } = usePhoneNumbers();

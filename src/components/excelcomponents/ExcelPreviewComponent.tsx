@@ -3,17 +3,19 @@ import { ChevronLeft, ChevronRight, Upload } from "lucide-react";
 import { getVariableCount } from "../functions";
 
 interface ExcelPreviewProps {
-  
+
   selectedTemplate: any;
   messages: any[][];
-  imageUrl:string
+  imageUrl: string
   setImageUrl: (imageUrl: string) => void;
+  documentUrl: string
+  setDocumentUrl: (documentUrl: string) => void
 }
 
-const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate,messages,imageUrl,setImageUrl }) => {
+const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate, messages, imageUrl, setImageUrl }) => {
   const [variables, setVariables] = useState<any>();
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const rowsPerPage = 10;
   const totalPages = Math.ceil((messages.length - 1) / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage + 1;
@@ -47,30 +49,41 @@ const ExcelPreview: React.FC<ExcelPreviewProps> = ({ selectedTemplate,messages,i
           <h3 className="text-lg font-semibold text-gray-800 mb-2">
             Ejemplo del texto de la plantilla
           </h3>
-          {selectedTemplate.components[0].type === "HEADER" && (
-            <>
-              <h3>Con Imagen</h3>
-              <p className="text-gray-600">
-                {selectedTemplate.components[1].text}
-              </p>
+          {selectedTemplate.components[0].type === 'HEADER' && (
+            selectedTemplate.components[0].format === 'IMAGE' ? (
               <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  URL de la Imagen
-                </label>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    placeholder="Sube la imagen desde internet"
-                    className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                  <button className="p-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 transition-colors duration-300">
-                    <Upload className="h-5 w-5" />
-                  </button>
-                </div>
+                <h3>Con Imagen</h3>
+                <input
+                  type="text"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  placeholder="Sube la URL de la imagen"
+                  className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               </div>
-            </>
+            ) : selectedTemplate.components[0].format === 'VIDEO' ? (
+              <div className="space-y-4">
+                <h3>Con Video</h3>
+                <input
+                  type="text"
+                  // value={videoUrl}
+                  // onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="Sube la URL del video"
+                  className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            ) : selectedTemplate.components[0].format === 'DOCUMENT' ? (
+              <div className="space-y-4">
+                <h3>Con Documento</h3>
+                <input
+                  type="text"
+                  // value={documentUrl}
+                  // onChange={(e) => setDocumentUrl(e.target.value)}
+                  placeholder="Sube la URL del documento"
+                  className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            ) : null
           )}
           {selectedTemplate.components[0].type === "BODY" && (
             <>

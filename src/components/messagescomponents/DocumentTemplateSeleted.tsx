@@ -6,7 +6,7 @@ import { Upload, Send, Phone } from "lucide-react";
 import { cuatroVariableDocument, dosVariableDocument, sinVariableDocument, tresVariableDocument, unaVariableDocument } from "../config/envs";
 
 const DocumentTemplateSelected: React.FC<any> = ({
-  selectedTemplate,
+  selectedTemplate, 
 }) => {
   const [variables, setVariables] = useState<any>();
   const [variableValues, setVariableValues] = useState<{ [key: string]: string }>({});
