@@ -9,27 +9,16 @@ export const useWhatsappData = () => {
   const [error, setError] = useState<string | null>(null);
   const [forceRefresh, setForceRefresh] = useState<boolean>(false);
 
- 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const storedData = localStorage.getItem('whatsappData');
-    if (storedData && !forceRefresh) {
-     
-      setData(JSON.parse(storedData));
+    try {
+      const response = await axios.get<FetchDatafromAPIClass[]>(api_user);
+     //console.log(response.data);
+      setData(response.data);
       setLoading(false);
-    } else {
-      try {
-        
-        const response = await axios.get<FetchDatafromAPIClass[]>(api_user);
-        const uniqueData = Array.from(new Set(response.data.map(item => item.phone)));
-      
-        setData((prevData) => [...prevData, ...uniqueData]);
-        localStorage.setItem('whatsappData', JSON.stringify([...(JSON.parse(storedData!) || []), ...response.data]));
-        setLoading(false);
-      } catch (err) {
-        setError('Error fetching data');
-        setLoading(false);
-      }
+    } catch (err) {
+      setError('Error fetching data');
+      setLoading(false);
     }
   }, [forceRefresh]);
 
@@ -39,7 +28,6 @@ export const useWhatsappData = () => {
 
   const refreshData = () => {
     setForceRefresh(true);
-    localStorage.removeItem('whatsappData');
     fetchData().finally(() => setForceRefresh(false));
   };
 
