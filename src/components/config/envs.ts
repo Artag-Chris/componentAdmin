@@ -41,7 +41,7 @@ export const getTemplates = import.meta.env.VITE_TEMPLATE_GETTEMPLATES
 export const getCustomerMessages = import.meta.env.VITE_GETALLCUSTOMERMESSAGES
 export const getBotMessages = import.meta.env.VITE_GETALLBOTMESSAGES
 export const getPhoneNumber = import.meta.env.VITE_GETPHONENUMBER
-
+export const dispatchUser = import.meta.env.VITE_DISPATCHUSER
 export const metaToken = import.meta.env.VITE_GRAPH_API_TOKEN
 
 export const botNumber = import.meta.env.VITE_BOT_NUMBER

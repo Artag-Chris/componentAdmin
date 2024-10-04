@@ -7,7 +7,7 @@ import { ChatMessages } from "./interfaces/mergedDataMessages";
 import { User, WhatsappMessage, WhatsappStatus } from "./interfaces";
 import { removeBase64Prefix } from "./functions/removeBase64Prefix";
 import { ImageMessage, VideoMessage, VoiceMessage, DocumentMessage } from "./chatcomponents";
-import { botNumber, documentResponse, fileMediaMeta, frontDocument, frontImage, frontMessage, frontVideo, imageResponse, metaToken, textResponse, url_base, videoResponse } from "./config/envs";
+import { botNumber, dispatchUser, documentResponse, fileMediaMeta, frontDocument, frontImage, frontMessage, frontVideo, imageResponse, metaToken, textResponse, url_base, videoResponse } from "./config/envs";
 import TetrisLoader from "../loaders/TetrisLoader";
 
 interface Props {
@@ -397,7 +397,22 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
 
   const handleDispatchClient = async () => {
     // Implement the API call to dispatch the client here
-    console.log("Dispatching client");
+    //console.log(specificData.phone);
+    const response = await fetch(dispatchUser, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+       
+        phone: specificData.phone,
+        
+      }),
+    }).then((response) => response.json());
+  
+    if (response.status === 200) {
+      console.log('Dispatch successful');
+    }
     setShowDispatchButtons(false);
   };
 
