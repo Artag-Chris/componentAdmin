@@ -32,7 +32,7 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
       console.log('Conexión establecida con la API');
       setWsConnected(true);
     };
-    
+
     wsRef.current.onmessage = (event) => {
       try {
         try {
@@ -63,8 +63,8 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
         console.error('Error general:', error);
       }
     };
-    
-    
+
+
     wsRef.current.onclose = () => {
       console.log('Conexión cerrada');
     };
@@ -102,43 +102,43 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
         </button>
       </div>
       <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-      {messages.map((item: any) => {
-  if (item !== null && item.id !== null && item.id !== undefined && item.WhatsappMessage && item.WhatsappMessage.length > 0 && item.WhatsappMessage[0].status === 'unread') {
-    return (
-      <div
-        key={item.id}
-        className={`mb-4 p-4 bg-gray-100 rounded-lg shadow-md cursor-pointer transition duration-300 ease-in-out
-          ${selectedUserId === item.id 
-            ? "bg-purple-100 border-2 border-purple-500" 
-            : "hover:bg-gray-200"
-          }`}
-        onClick={() => handleClick(item)}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <p className="font-semibold text-lg">{item.name}</p>
-            <p className="text-gray-600">{numberParser(item.phone)}</p>
-          </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              window.open(`https://wa.me/${item.phone}`, "_blank");
-            }}
-            className="p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50"
-            aria-label={`Abrir chat de WhatsApp con ${item.name}`}
-          >
-            <MessageCircle className="w-5 h-5" />
-          </button>
-        </div>
-        <p className="text-gray-700 bg-white p-2 rounded-md shadow-sm">
-          "{item.WhatsappMessage[0].message}"
-        </p>
-      </div>
-    );
-  } else {
-    return null;
-  }
-})}
+        {messages.map((item: any) => {
+          if (item !== null && item.id !== null && item.id !== undefined && item.WhatsappMessage && item.WhatsappMessage.length > 0 && item.WhatsappMessage[0].status === 'unread') {
+            return (
+              <div
+                key={item.id}
+                className={`mb-4 p-4 bg-gray-100 rounded-lg shadow-md cursor-pointer transition duration-300 ease-in-out
+          ${selectedUserId === item.id
+                    ? "bg-purple-100 border-2 border-purple-500"
+                    : "hover:bg-gray-200"
+                  }`}
+                onClick={() => handleClick(item)}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="font-semibold text-lg">{item.name}</p>
+                    <p className="text-gray-600">{numberParser(item.phone)}</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(`https://wa.me/${item.phone}`, "_blank");
+                    }}
+                    className="p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50"
+                    aria-label={`Abrir chat de WhatsApp con ${item.name}`}
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                  </button>
+                </div>
+                <p className="text-gray-700 bg-white p-2 rounded-md shadow-sm">
+                  "{item.WhatsappMessage[0].message}"
+                </p>
+              </div>
+            );
+          } else {
+            return null;
+          }
+        })}
       </div>
     </div>
   );

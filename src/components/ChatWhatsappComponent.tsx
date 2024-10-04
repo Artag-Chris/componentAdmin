@@ -110,6 +110,10 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   }, []);
 
   const handleSendMessage = async () => {
+    if (inputText.trim() === '') {
+      alert('Por favor, ingresa un mensaje');
+      return;
+    }
     if (inputText.trim()) {
       const newMessage: ChatMessages = {
         id: `${(messages?.length + 1).toString()}`,
@@ -143,7 +147,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     const enviar: User = {
       name: "Bot",
       phone: `${botNumber}`,
-      identification:`${botNumber}` ,
+      identification: `${botNumber}`,
       atending: 0,
       lastActive: new Date(),
       wppStatus: WhatsappStatus.attended,
@@ -207,7 +211,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
 
     if (file) {
       const reader = new FileReader();
-      reader.onload = async(e) => {
+      reader.onload = async (e) => {
         const content = e.target?.result as string;
         const blob = await fileToBlob(file);
         const base64StringWithoutPrefix = removeBase64Prefix(content);
@@ -407,9 +411,9 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           botNumber: botNumber
         }),
       });
-  
-      if (response.ok) {  
-      setShowDispatchButtons(false);
+
+      if (response.ok) {
+        setShowDispatchButtons(false);
       } else {
         console.error('Error:', response.status);
       }
@@ -431,16 +435,14 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${
-              message.direction === "outgoing" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${message.direction === "outgoing" ? "justify-end" : "justify-start"
+              }`}
           >
             <div
-              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                message.direction === "outgoing"
+              className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.direction === "outgoing"
                   ? "bg-purple-500 text-white"
                   : "bg-white text-gray-800 border border-gray-200"
-              }`}
+                }`}
             >
               {message.type === "text" && (
                 <p className="text-sm">{message.message}</p>
@@ -458,11 +460,10 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                 <DocumentMessage direction={message.direction} src={message} />
               )}
               <p
-                className={`text-xs mt-1 ${
-                  message.direction === "outgoing"
+                className={`text-xs mt-1 ${message.direction === "outgoing"
                     ? "text-purple-200"
                     : "text-gray-500"
-                }`}
+                  }`}
               >
                 {format(new Date(message.timestamp), "HH:mm")}
               </p>
@@ -479,6 +480,11 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Escribe un mensaje"
             className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.keyCode === 13) {
+                handleSendMessage();
+              }
+            }}
           />
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -496,9 +502,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           />
           <button
             onClick={handleVoiceRecording}
-            className={`p-2 rounded-full ${
-              isRecording ? "bg-red-500" : "bg-gray-200"
-            } text-white hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-red-300`}
+            className={`p-2 rounded-full ${isRecording ? "bg-red-500" : "bg-gray-200"
+              } text-white hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-red-300`}
             aria-label={isRecording ? "Detener grabación" : "Iniciar grabación de voz"}
           >
             <Mic size={20} />
