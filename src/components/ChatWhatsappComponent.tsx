@@ -396,26 +396,27 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   };
 
   const handleDispatchClient = async () => {
-    // Implement the API call to dispatch the client here
-    //console.log(specificData.phone);
-    const response = await fetch(dispatchUser, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-       
-        phone: specificData.phone,
-        
-      }),
-    }).then((response) => response.json());
+    try {
+      const response = await fetch(dispatchUser, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          phone: specificData.phone,
+          botNumber: botNumber
+        }),
+      });
   
-    if (response.status === 200) {
-      console.log('Dispatch successful');
+      if (response.ok) {  
+      setShowDispatchButtons(false);
+      } else {
+        console.error('Error:', response.status);
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
-    setShowDispatchButtons(false);
   };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-full">

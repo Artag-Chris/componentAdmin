@@ -16,10 +16,13 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
   const { data: initialData, loading, error, refreshData } = useWhatsappData();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
+  const [wsConnected, setWsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    setMessages(initialData);
+    if (initialData) {
+      setMessages(initialData);
+    }
   }, [initialData]);
 
   useEffect(() => {
@@ -27,25 +30,29 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
 
     wsRef.current.onopen = () => {
       console.log('Conexión establecida con la API');
+      setWsConnected(true);
     };
     
     wsRef.current.onmessage = (event) => {
       try {
         try {
           const newData = JSON.parse(event.data);
-          
+          console.log('Received data:', newData);
           if (newData.type === 'broadcast' && newData.payload) {
-            const {  phone, message } = newData.payload;
-            setMessages(prevMessages => {
-              return prevMessages.map((user) => {
-                if (user.phone === phone) {
-                  
-                  return { ...user, WhatsappMessage: [{ message }] };
-                }
-    
-                return user;
+            const { phone, message } = newData.payload;
+            const existingUser = messages.find((user) => user.phone === phone);
+            if (!existingUser) {
+              refreshData(); // Vuelve a pedir la data inicial si el usuario no está en el arreglo
+            } else {
+              setMessages(prevMessages => {
+                return prevMessages.map((user) => {
+                  if (user.phone === phone) {
+                    return { ...user, WhatsappMessage: [{ message }] };
+                  }
+                  return user;
+                });
               });
-            });
+            }
           } else {
             console.error('Error: La información recibida no es un objeto válido');
           }
@@ -57,9 +64,6 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
       }
     };
     
-    wsRef.current.onerror = (error) => {
-      console.error('Error de WebSocket:', error);
-    };
     
     wsRef.current.onclose = () => {
       console.log('Conexión cerrada');
@@ -67,7 +71,7 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
 
     return () => {
       if (wsRef.current) {
-        wsRef.current.close();
+        console.log('Cerrando WebSocket');
       }
     };
   }, []);
@@ -76,8 +80,6 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
     onSelectUser(item);
     setSelectedUserId(item.id || null);
   };
-
-  
 
   if (loading) {
     return <TetrisLoader />;
@@ -100,45 +102,43 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
         </button>
       </div>
       <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto">
-        {messages.map((item: any) => {
-          if (item !== null && item.id !== null && item.id !== undefined) {
-            return (
-              <div
-                key={item.id}
-                className={`mb-4 p-4 bg-gray-100 rounded-lg shadow-md cursor-pointer transition duration-300 ease-in-out
-                  ${selectedUserId === item.id 
-                    ? "bg-purple-100 border-2 border-purple-500" 
-                    : "hover:bg-gray-200"
-                  }`}
-                onClick={() => handleClick(item)}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <p className="font-semibold text-lg">{item.name}</p>
-                    <p className="text-gray-600">{numberParser(item.phone)}</p>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(`https://wa.me/${item.phone}`, "_blank");
-                    }}
-                    className="p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50"
-                    aria-label={`Abrir chat de WhatsApp con ${item.name}`}
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                  </button>
-                </div>
-                {item.WhatsappMessage && item.WhatsappMessage.length > 0 && (
-                  <p className="text-gray-700 bg-white p-2 rounded-md shadow-sm">
-                    "{item.WhatsappMessage[0].message}"
-                  </p>
-                )}
-              </div>
-            );
-          } else {
-            return null;
-          }
-        })}
+      {messages.map((item: any) => {
+  if (item !== null && item.id !== null && item.id !== undefined && item.WhatsappMessage && item.WhatsappMessage.length > 0 && item.WhatsappMessage[0].status === 'unread') {
+    return (
+      <div
+        key={item.id}
+        className={`mb-4 p-4 bg-gray-100 rounded-lg shadow-md cursor-pointer transition duration-300 ease-in-out
+          ${selectedUserId === item.id 
+            ? "bg-purple-100 border-2 border-purple-500" 
+            : "hover:bg-gray-200"
+          }`}
+        onClick={() => handleClick(item)}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <p className="font-semibold text-lg">{item.name}</p>
+            <p className="text-gray-600">{numberParser(item.phone)}</p>
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(`https://wa.me/${item.phone}`, "_blank");
+            }}
+            className="p-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-opacity-50"
+            aria-label={`Abrir chat de WhatsApp con ${item.name}`}
+          >
+            <MessageCircle className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-gray-700 bg-white p-2 rounded-md shadow-sm">
+          "{item.WhatsappMessage[0].message}"
+        </p>
+      </div>
+    );
+  } else {
+    return null;
+  }
+})}
       </div>
     </div>
   );
