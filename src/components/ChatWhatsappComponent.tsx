@@ -330,7 +330,13 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                   },
                   body: formData,
                 }
-              ),
+              )
+                .then((response) => response.json()
+                )
+                .then((data) => setMediaId(data)
+                ).then(() => console.log("Media ID:", mediaId)
+                )
+              ,
               fetch(imageResponse, {
                 method: "POST",
                 headers: {
@@ -367,7 +373,13 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                   },
                   body: formData,
                 }
-              ),
+              )
+                .then((response) => response.json()
+                )
+                .then((data) => setMediaId(data)
+                ).then(() => console.log("Media ID:", mediaId)
+                )
+              ,
               fetch(videoResponse, {
                 method: "POST",
                 headers: {
