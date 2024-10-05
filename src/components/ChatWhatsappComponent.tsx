@@ -22,7 +22,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
   const [recordingTime, setRecordingTime] = useState(0);
   const [showDispatchButtons, setShowDispatchButtons] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [mediaId, setMediaId] = useState<any>();
+  const [mediaId, setMediaId] = useState<any>("");
   const { specificData, refreshData } = useSpecificData(user?.phone);
   const [envio, setenvio] = useState<User | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -213,14 +213,15 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const content = e.target?.result as string;
-        const blob = await fileToBlob(file);
         const base64StringWithoutPrefix = removeBase64Prefix(content);
+        const blob = await fileToBlob(file);
         const formData = new FormData();
+
         formData.append("messaging_product", "whatsapp");
         formData.append("file", blob);
         formData.append("type", file.type);
 
-        const newMessage: ChatMessages = {
+        const newMessage: any = {
           id: `${(messages?.length + 1).toString()}`,
           type: file.type,
           message: base64StringWithoutPrefix,
@@ -229,7 +230,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           to: specificData.phone,
           customerId: specificData.id,
           attendant: specificData.attending,
-          status: "delivered",
+          status: "unread",
           mediaId: "",
         };
         const sendToApi: any = {
@@ -245,7 +246,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           to: specificData.phone,
           customerId: specificData.id,
           attendant: specificData.attending,
-          status: "delivered",
+          status: "unread",
           mediaId: "",
         };
 
@@ -259,23 +260,34 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
           case "application/pdf":
             Promise.all([
+              //guarda en la base de datos 
               fetch(frontDocument, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
                 },
                 body: JSON.stringify(sendToApi),
+              }).then((response) => {
+                //  console.log("Respuesta de frontDocument:", response);
+              }).catch((error) => {
+                console.error("Error en frontDocument:", error);
               }),
-              fetch(
-                fileMediaMeta,
-                {
-                  method: "POST",
-                  headers: {
-                    Authorization: `Bearer ${metaToken}`,
-                  },
-                  body: formData,
-                }
-              ),
+              fetch(fileMediaMeta, {
+                //envia el formato a meta
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${metaToken}`,
+                },
+                body: formData,
+              })
+                .then((response) => response.json()
+                )
+                .then((data) => setMediaId(data)
+                ).then(() => console.log("Media ID:", mediaId)
+                )
+                .catch((error) => {
+                  console.error("Error en fileMediaMeta:", error);
+                }),
               fetch(documentResponse, {
                 method: "POST",
                 headers: {
@@ -287,10 +299,16 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
                   phone: botNumber,
                   type: file.type,
                 }),
+              }).then((response) => {
+                //  console.log("Respuesta de documentResponse:", response);
+              }).catch((error) => {
+                console.error("Error en documentResponse:", error);
               }),
-            ])
-              .then(() => console.log("Todas las solicitudes se han completado con éxito"))
-              .catch((error) => console.error("Error al enviar las solicitudes:", error));
+            ]).then(() => {
+              console.log("Todas las solicitudes se han completado con éxito");
+            }).catch((error) => {
+              console.error("Error al enviar las solicitudes:", error);
+            });
             break;
           case "image/jpeg":
           case "image/png":
@@ -440,8 +458,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           >
             <div
               className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.direction === "outgoing"
-                  ? "bg-purple-500 text-white"
-                  : "bg-white text-gray-800 border border-gray-200"
+                ? "bg-purple-500 text-white"
+                : "bg-white text-gray-800 border border-gray-200"
                 }`}
             >
               {message.type === "text" && (
@@ -461,8 +479,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
               )}
               <p
                 className={`text-xs mt-1 ${message.direction === "outgoing"
-                    ? "text-purple-200"
-                    : "text-gray-500"
+                  ? "text-purple-200"
+                  : "text-gray-500"
                   }`}
               >
                 {format(new Date(message.timestamp), "HH:mm")}
