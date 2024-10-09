@@ -19,6 +19,7 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
 
   const handleSendTemplate = () => {
    interface Payload {
+        template: string,
         phone: string,
         mediaId: string,
         texto?: string;
@@ -27,6 +28,7 @@ const ImageTemplateSelected: React.FC<ImageTemplateReceived> = ({
         texto4?: string;
       };
       let payload: Payload = {
+        template: `${selectedTemplate.name}`,
         phone: `${phoneNumber}`,
         mediaId: `${imageUrl}`
       };

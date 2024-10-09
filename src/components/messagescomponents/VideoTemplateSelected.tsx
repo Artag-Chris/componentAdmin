@@ -18,6 +18,7 @@ const ImageTemplateSelected: React.FC<any> = ({
 
   const handleSendTemplate = () => {
     interface Payload {
+      template: string,
       phone: string,
       mediaId: string,
       texto?: string;
@@ -27,7 +28,8 @@ const ImageTemplateSelected: React.FC<any> = ({
     };
     let payload: Payload = {
       phone: `${phoneNumber}`,
-      mediaId: `${videoUrl}`
+      mediaId: `${videoUrl}`,
+      template: `${selectedTemplate.name}`,
     };
 
     switch (getVariableCount(selectedTemplate.name).variableCount) {

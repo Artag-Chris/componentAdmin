@@ -19,6 +19,7 @@ const DocumentTemplateSelected: React.FC<any> = ({
 
   const handleSendTemplate = () => {
     interface Payload {
+      template: string,
       phone: string,
       mediaId: string,
       texto?: string;
@@ -28,7 +29,8 @@ const DocumentTemplateSelected: React.FC<any> = ({
     };
     let payload: Payload = {
       phone: `${phoneNumber}`,
-      mediaId: `${documentUrl}`
+      mediaId: `${documentUrl}`,
+      template: `${selectedTemplate.name}`,
     };
 
     switch (getVariableCount(selectedTemplate.name).variableCount) {
