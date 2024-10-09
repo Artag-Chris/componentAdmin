@@ -21,6 +21,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
 
   const handleSendTemplate = () => {
     interface Payload {
+      template: string;
       phone: string;
       texto?: string;
       texto2?: string;
@@ -29,6 +30,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
     }
     let payload: Payload = {
       phone: `${phoneNumber}`,
+      template: `${selectedTemplate.name}`,
     };
 
     switch (getVariableCount(selectedTemplate.name).variableCount) {
