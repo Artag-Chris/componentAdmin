@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import AppRouter from './router/Router';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -27,6 +29,17 @@ const App: React.FC = () => {
           </div>
         </main>
       </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };
