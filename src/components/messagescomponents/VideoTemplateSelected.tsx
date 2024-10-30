@@ -18,6 +18,7 @@ const ImageTemplateSelected: React.FC<any> = ({
 
   const handleSendTemplate = () => {
     interface Payload {
+      selectedTemplate: any;
       template: string,
       phone: string,
       mediaId: string,
@@ -27,6 +28,7 @@ const ImageTemplateSelected: React.FC<any> = ({
       texto4?: string;
     };
     let payload: Payload = {
+      selectedTemplate: selectedTemplate,
       phone: `${phoneNumber}`,
       mediaId: `${videoUrl}`,
       template: `${selectedTemplate.name}`,
@@ -84,7 +86,8 @@ const ImageTemplateSelected: React.FC<any> = ({
         // Código para manejar otros tipos de componentes
         break;
     }
-
+    setPhoneNumber("");
+    setVariableValues({});
   };
 
 

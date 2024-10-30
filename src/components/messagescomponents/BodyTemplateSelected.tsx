@@ -18,9 +18,10 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
   useEffect(() => {
     setVariables(getVariableCount(selectedTemplate.name));
   }, [selectedTemplate]);
-
+console.log(selectedTemplate);
   const handleSendTemplate = () => {
     interface Payload {
+      selectedTemplate: any;
       template: string;
       phone: string;
       texto?: string;
@@ -29,6 +30,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
       texto4?: string;
     }
     let payload: Payload = {
+      selectedTemplate: selectedTemplate,
       phone: `${phoneNumber}`,
       template: `${selectedTemplate.name}`,
     };
@@ -80,7 +82,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
         break;
     }
     setPhoneNumber("");
-    setVariables(null);
+    setVariableValues({});
   };
 
   return (
