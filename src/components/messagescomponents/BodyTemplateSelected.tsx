@@ -36,6 +36,7 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
     switch (getVariableCount(selectedTemplate.name).variableCount) {
       case 0:
         sendTemplate(sinVariable, payload);
+        
 
         break;
       case 1:
@@ -72,11 +73,14 @@ const BodyTemplateSelected: React.FC<BodyTemplateReceived> = ({
           texto4: `${variableValues.variable4}`,
         };
         sendTemplate( cuatroVariable, payload );
+
         break;
       default:
         // Código para manejar otros tipos de componentes
         break;
     }
+    setPhoneNumber("");
+    setVariables(null);
   };
 
   return (

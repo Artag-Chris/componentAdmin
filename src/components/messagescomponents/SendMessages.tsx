@@ -22,7 +22,7 @@ export const SendMessagesTemplate: React.FC<SendMessagesTemplateProps> = ({ sele
    isExcelFileLoaded, messages,setImageUrl,  imageUrl, documentUrl, setDocumentUrl
   , videoUrl, setVideoUrl}) => {
  
-console.log(selectedTemplate.name);
+
   if (isExcelFileLoaded) {
     // Si se ha cargado un documento de Excel, no se puede acceder a los componentes
     return <div>
