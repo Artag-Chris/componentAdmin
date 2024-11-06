@@ -208,7 +208,7 @@ export default function SendMessages({
         const token = Math.random().toString(36).substr(2, 9);
         const payload = {
           selectedTemplate,
-          template: selectedTemplate,
+          template: selectedTemplate.name,
           mediaId: selectedTemplate.components[0].format === 'IMAGE' ? imageUrl : selectedTemplate.components[0].format === 'VIDEO' ? videoUrl : documentUrl,
           phone: phone,
           texto: texto,
