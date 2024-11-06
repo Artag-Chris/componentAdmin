@@ -37,7 +37,7 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
       try {
         try {
           const newData = JSON.parse(event.data);
-          console.log('Received data:', newData);
+         // console.log('Received data:', newData);
           if (newData.type === 'broadcast' && newData.payload) {
             const { phone, message } = newData.payload;
             const existingUser = messages.find((user) => user.phone === phone);
