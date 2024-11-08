@@ -16,8 +16,8 @@ export const sendTemplate = async (url: string, payload: any) => {
     } else {
       toast.error(`Error al enviar el mensaje: ${data.messages[0].message_status}`);
     }
-  } catch (error: any) {
-    console.error('Error:', error.message.message);
+  } catch (error: AxiosError | any) {
+    console.error('Error:', error.message.response?.data || error.message);
     toast.error('Error al enviar el mensaje');
   }
 };
