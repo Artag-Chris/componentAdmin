@@ -1,5 +1,6 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import { MetaMessageResponse } from '../../dto/metaRespose.DTO';
 
 export const sendTemplate = async (url: string, payload: any) => {
   try {
@@ -8,10 +9,15 @@ export const sendTemplate = async (url: string, payload: any) => {
         'Content-Type': 'application/json',
       },
     });
-    console.log('Respuesta:', respuesta.data);
-    toast.success('Mensaje enviado correctamente!');
-  } catch (error) {
-    console.error('Error:', error);
+    const data: MetaMessageResponse = respuesta.data;
+    console.log(`Respuesta:`, data.messages[0].message_status);
+    if (data.messages[0].message_status === 'accepted') {
+      toast.success('Mensaje enviado correctamente!');
+    } else {
+      toast.error(`Error al enviar el mensaje: ${data.messages[0].message_status}`);
+    }
+  } catch (error: any) {
+    console.error('Error:', error.message.message);
     toast.error('Error al enviar el mensaje');
   }
 };

@@ -30,7 +30,7 @@ console.log(selectedTemplate);
       texto4?: string;
     }
     let payload: Payload = {
-      selectedTemplate: selectedTemplate,
+      selectedTemplate,
       phone: `${phoneNumber}`,
       template: `${selectedTemplate.name}`,
     };

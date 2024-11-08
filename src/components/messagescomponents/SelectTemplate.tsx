@@ -29,13 +29,12 @@ export default function SendMessages({
   documentUrl,
   videoUrl
 }: SendMessagesProps) {
-  const { templates, error, loading } = useTemplates();
+  const { templates, } = useTemplates();
   const { phoneNumbers } = usePhoneNumbers();
  
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState("");
   const [file, setFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingComponent, setIsLoadingComponent] = useState(true)
   const [result, setResult] = useState<{
     success: boolean;
     messagesSent: any;
@@ -210,11 +209,11 @@ export default function SendMessages({
           selectedTemplate,
           template: selectedTemplate.name,
           mediaId: selectedTemplate.components[0].format === 'IMAGE' ? imageUrl : selectedTemplate.components[0].format === 'VIDEO' ? videoUrl : documentUrl,
-          phone: phone,
-          texto: texto,
-          texto2: texto2,
-          texto3: texto3,
-          texto4: texto4,
+          phone,
+          texto,
+          texto2,
+          texto3,
+          texto4,
         };
   
         // Envía la solicitud evita la petición doble
