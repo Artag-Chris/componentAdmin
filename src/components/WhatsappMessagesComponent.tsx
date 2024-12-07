@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useState, useRef } from "react";
 import { useWhatsappData } from "./hook/useWhatsappData";
 import { User } from "./interfaces";
@@ -23,7 +24,10 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
     if (initialData) {
       setMessages(initialData);
     }
-  }, [initialData]);
+
+  }, [
+   initialData
+  ]);
 
   useEffect(() => {
     wsRef.current = new WebSocket(`ws://${url_base}/ws`);
@@ -34,16 +38,17 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
     };
 
     wsRef.current.onmessage = (event) => {
+      
       try {
-        try {
-          const newData = JSON.parse(event.data);
-         // console.log('Received data:', newData);
-          if (newData.type === 'broadcast' && newData.payload) {
-            const { phone, message } = newData.payload;
-            const existingUser = messages.find((user) => user.phone === phone);
-            if (!existingUser) {
-              refreshData(); // Vuelve a pedir la data inicial si el usuario no está en el arreglo
-            } else {
+        const newData = JSON.parse(event.data);
+        if (newData.type === 'broadcast' && newData.payload) {
+          const { phone, message } = newData.payload;
+          const existingUser = messages.find((user) => user.phone === phone);
+          if (!existingUser) {
+            //esto es muy invacibo hay que volverlo mas seguro
+           refreshData(); // Vuelve a pedir la data inicial si el usuario no está en el arreglo
+          } else {
+           
               setMessages(prevMessages => {
                 return prevMessages.map((user) => {
                   if (user.phone === phone) {
@@ -52,17 +57,16 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
                   return user;
                 });
               });
-            }
-          } else {
-            console.error('Error: La información recibida no es un objeto válido');
+         // Esperar 20 segundos antes de actualizar el estado
           }
-        } catch (error) {
-          console.error('Error al parsear la información recibida:', error);
+        } else {
+          console.error('Error: La información recibida no es un objeto válido');
         }
       } catch (error) {
-        console.error('Error general:', error);
+        console.error('Error al parsear la información recibida:', error);
       }
     };
+    
 
 
     wsRef.current.onclose = () => {
@@ -80,11 +84,11 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
     onSelectUser(item);
     setSelectedUserId(item.id || null);
   };
-
+/*
   if (loading) {
     return <TetrisLoader />;
   }
-
+*/
   if (error) {
     return <div className="text-red-500 p-4 text-center">{error}</div>;
   }

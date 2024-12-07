@@ -8,7 +8,7 @@ import TetrisLoader from "../loaders/TetrisLoader";
 
 const HomePage = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
-    const { data, loading, error } = useWhatsappData();
+    const { loading, error } = useWhatsappData();
 
     const handleSelectUser = (user: User) => {
         setSelectedUser(user);

@@ -6,7 +6,7 @@ import useTemplates from "../hook/useTemplates";
 import { getVariableCount } from "../functions";
 import TetrisLoader from "../../loaders/TetrisLoader";
 import { sinVariableImagen, unaVariableImagen, dosVariableImagen, tresVariableImagen, cuatroVariableImagen, sinVariable, unaVariable, dosVariable, tresVariable, cuatroVariable, sinVariableDocument, cuatroVariableDocument, dosVariableDocument, tresVariableDocument, unaVariableDocument, cuatroVariableVideo, dosVariableVideo, sinVariableVideo, tresVariableVideo, unaVariableVideo } from "../config/envs";
-
+import { toast } from 'react-toastify';
 
 interface SendMessagesProps {
   setSelectedTemplate: (template: any) => void;
@@ -31,7 +31,7 @@ export default function SendMessages({
 }: SendMessagesProps) {
   const { templates, } = useTemplates();
   const { phoneNumbers } = usePhoneNumbers();
- 
+
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState("");
   const [file, setFile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,20 +77,20 @@ export default function SendMessages({
     if (!selectedTemplate || !selectedPhoneNumber || messages.length === 0) {
       return;
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const promises = messages.map(async (fila: any, index: any) => {
         if (index === 0) return; // Salta la primera iteración
-  
+
         // Procesa la fila de datos
         let phone = "";
         let texto = "";
         let texto2 = "";
         let texto3 = "";
         let texto4 = "";
-  
+
         for (const [columna, valor] of Object.entries(fila)) {
           const indice = parseInt(columna, 10);
           if (indice === 0) {
@@ -105,7 +105,7 @@ export default function SendMessages({
             texto4 = valor as string;
           }
         }
-  
+
         // Define la URL en función del tipo de componente
         let url;
         if (selectedTemplate.components[0].type === 'HEADER') {
@@ -144,7 +144,7 @@ export default function SendMessages({
                   url = dosVariableVideo;
                   break;
                 case 3:
-                 url = tresVariableVideo;
+                  url = tresVariableVideo;
                   break;
                 case 4:
                   url = cuatroVariableVideo;
@@ -202,7 +202,7 @@ export default function SendMessages({
               break;
           }
         }
-  
+
         // Envía la solicitud
         const token = Math.random().toString(36).substr(2, 9);
         const payload = {
@@ -215,7 +215,7 @@ export default function SendMessages({
           texto3,
           texto4,
         };
-  
+
         // Envía la solicitud evita la petición doble
         const response = await fetch(`${url}?token=${token}`, {
           method: "POST",
@@ -224,7 +224,7 @@ export default function SendMessages({
           },
           body: JSON.stringify(payload),
         });
-  
+
         // Procesa la respuesta
         if (!response.ok) {
           throw new Error("Error al enviar el mensaje");
@@ -232,16 +232,39 @@ export default function SendMessages({
         console.log("Respuesta:", response.statusText);
         return response.json();
       });
-  
+
       // Espera a que todas las solicitudes se completen
+      //implementar el toast 
+      //para ver que se enviaron los mensajes
       await Promise.all(promises);
+
+      toast.success("Mensajes enviados correctamente!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+
     } catch (error) {
+      //implementar el toast si no se envio un mensaje
       console.error("Error al enviar los mensajes", error);
+      toast.error("Error al enviar los mensajes", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="container mx-auto p-4 max-w-md">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
@@ -249,7 +272,7 @@ export default function SendMessages({
           <h2 className="text-2xl font-bold text-white">Envío de plantillas</h2>
         </div>
         <div className="p-6 space-y-4">
-         
+
           <div className="space-y-2">
             <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
               Selecciona un número del cual enviar
@@ -320,7 +343,7 @@ export default function SendMessages({
                       type="file"
                       accept=".xlsx, .xls"
                       onChange={handleFileUpload}
-                      className="hidden"  
+                      className="hidden"
                     />
                   </label>
                   {file && (
@@ -365,11 +388,10 @@ export default function SendMessages({
           <button
             onClick={handleSubmit}
             disabled={!selectedTemplate || !selectedPhoneNumber || messages.length === 0 || isLoading}
-            className={`w-full py-2 px-4 rounded-md text-white font-semibold transition-all duration-300 flex items-center justify-center ${
-              !selectedTemplate || !selectedPhoneNumber || messages.length === 0 || isLoading
+            className={`w-full py-2 px-4 rounded-md text-white font-semibold transition-all duration-300 flex items-center justify-center ${!selectedTemplate || !selectedPhoneNumber || messages.length === 0 || isLoading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-            }`}
+              }`}
           >
             {isLoading ? (
               <>
@@ -386,11 +408,10 @@ export default function SendMessages({
 
           {result && (
             <div
-              className={`text-center p-2 rounded ${
-                result.success
+              className={`text-center p-2 rounded ${result.success
                   ? "bg-green-100 text-green-800"
                   : "bg-red-100 text-red-800"
-              }`}
+                }`}
             >
               {result.success
                 ? `Se enviaron ${result.messagesSent} mensajes exitosamente!`

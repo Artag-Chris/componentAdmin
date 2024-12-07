@@ -1,3 +1,4 @@
+"use client"
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { FetchDatafromAPIClass } from '../interfaces/fetchUsersData';
@@ -13,18 +14,22 @@ export const useWhatsappData = () => {
     setLoading(true);
     try {
       const response = await axios.get<FetchDatafromAPIClass[]>(api_user);
-     //console.log(response.data);
+
       setData(response.data);
       setLoading(false);
     } catch (err) {
       setError('Error fetching data');
       setLoading(false);
     }
-  }, [forceRefresh]);
+  }, [
+    forceRefresh
+  ]);
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+  }, [
+   fetchData
+  ]);
 
   const refreshData = () => {
     setForceRefresh(true);

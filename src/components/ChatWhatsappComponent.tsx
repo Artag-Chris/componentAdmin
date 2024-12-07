@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, Paperclip, Send, UserCheck, X } from "lucide-react";
 import useSpecificData from "./hook/useSpecificUserData";
@@ -63,7 +64,9 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [
+    messages
+  ]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -83,7 +86,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
     };
 
     ws.onmessage = (event) => {
-      refreshData();
+      //debo encontrar la manera de hacerlo no tan invasiva
+     // refreshData();
     };
 
     ws.onclose = () => {

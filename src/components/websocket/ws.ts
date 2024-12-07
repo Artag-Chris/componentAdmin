@@ -11,10 +11,12 @@ export const initializeWebSocket = (
     };
   
     ws.onmessage = (event) => {
+      
       const newData = JSON.parse(event.data);
       setData((prevData) => [...prevData, ...newData]);
       localStorage.setItem("whatsappData", JSON.stringify([...data, ...newData]));
-    };
+    
+      };
   
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
