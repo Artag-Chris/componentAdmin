@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Mic, Paperclip, Send, UserCheck, X } from "lucide-react";
 import useSpecificData from "./hook/useSpecificUserData";
+import { ToastContainer, toast } from 'react-toastify'; import 'react-toastify/dist/ReactToastify.css'
 import { Conversation } from "./class/Conversation";
 import { format } from "date-fns/format";
 import { ChatMessages } from "./interfaces/mergedDataMessages";
@@ -187,17 +188,90 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       console.error("Error sending message:", error);
     }
   };
-
-  const fileToBlob = (file: File): Promise<Blob> => {
+ 
+  const handleFileUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "image" | "video" | "document"
+  ) => {
+   
+    const file = event.target.files?.[0];
+    if (!file) return;
+  
+    const uploadToastId = toast.loading("Cargando archivo...");
+  
+    const setLoadingIndicator = (progress: number) => {
+      if (progress < 100) {
+        toast.update(uploadToastId, {
+          render: `Carga de archivo: ${progress}%`,
+          type: "info",
+          isLoading: true,
+          autoClose: false,
+        });
+      }
+    };
+  
+    const handleLoadEnd = async (base64StringWithoutPrefix: string) => {
+      try {
+        const blob = await fileToBlob(file, setLoadingIndicator);
+        const formData = createFormData(blob, file.type);
+  
+        const newMessage = createNewMessage(base64StringWithoutPrefix, file.type);
+        const sendToApi = createSendToApi(base64StringWithoutPrefix, file.type);
+  
+        toast.update(uploadToastId, {
+          render: `Cargando archivo...`,
+          type: "info",
+          isLoading: true,
+          autoClose: false,
+        });
+  
+        await handleFileTypeSwitch(newMessage.type, formData, sendToApi);
+  
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+  
+        toast.update(uploadToastId, {
+          render: 'Archivo subido exitosamente!',
+          type: "success",
+          isLoading: false,
+          autoClose: 5000,
+        });
+      } catch (error) {
+        console.error("Error handling file upload:", error);
+        toast.update(uploadToastId, {
+          render: 'Error al subir el archivo',
+          type: "error",
+          isLoading: false,
+          autoClose: 5000,
+        });
+      }
+    };
+  
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      const content = e.target?.result as string;
+      const base64StringWithoutPrefix = removeBase64Prefix(content);
+      await handleLoadEnd(base64StringWithoutPrefix);
+    };
+    reader.readAsDataURL(file);
+  };
+  
+  const fileToBlob = (
+    file: File,
+    onProgress: (progress: number) => void
+  ): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
+      reader.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = (event.loaded / event.total) * 100;
+          onProgress(progress);
+        }
+      };
       reader.onload = () => {
-        const result = reader.result;
-        if (result === null) {
-          reject(new Error('Failed to read file'));
+        if (reader.result === null) {
+          reject(new Error("Failed to read file"));
         } else {
-          const blob = new Blob([result], { type: file.type });
-          resolve(blob);
+          resolve(new Blob([reader.result], { type: file.type }));
         }
       };
       reader.onerror = () => {
@@ -206,211 +280,204 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       reader.readAsArrayBuffer(file);
     });
   };
-
-  const handleFileUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-    type: "image" | "video" | "document"
+  
+  const createFormData = (blob: Blob, fileType: string) => {
+    const formData = new FormData();
+    formData.append("messaging_product", "whatsapp");
+    formData.append("file", blob);
+    formData.append("type", fileType);
+    return formData;
+  };
+  
+  const createNewMessage = (message: string, fileType: string) => ({
+    id: `${(messages?.length + 1).toString()}`,
+    type: fileType,
+    message,
+    timestamp: new Date(),
+    direction: "outgoing",
+    to: specificData.phone,
+    customerId: specificData.id,
+    attendant: specificData.attending,
+    status: "unread",
+    mediaId: "",
+  });
+  
+  const createSendToApi = (message: string, fileType: string) => ({
+    id:
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15),
+    name: "Bot",
+    phone: botNumber,
+    type: fileType,
+    message,
+    timestamp: new Date(),
+    direction: "outgoing",
+    to: specificData.phone,
+    customerId: specificData.id,
+    attendant: specificData.attending,
+    status: "unread",
+    mediaId: "",
+  });
+  
+  const handleFileTypeSwitch = async (
+    fileType: string,
+    formData: FormData,
+    sendToApi: any
   ) => {
-    const file = event.target.files?.[0];
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const content = e.target?.result as string;
-        const base64StringWithoutPrefix = removeBase64Prefix(content);
-        const blob = await fileToBlob(file);
-        const formData = new FormData();
-
-        formData.append("messaging_product", "whatsapp");
-        formData.append("file", blob);
-        formData.append("type", file.type);
-
-        const newMessage: any = {
-          id: `${(messages?.length + 1).toString()}`,
-          type: file.type,
-          message: base64StringWithoutPrefix,
-          timestamp: new Date(),
-          direction: "outgoing",
-          to: specificData.phone,
-          customerId: specificData.id,
-          attendant: specificData.attending,
-          status: "unread",
-          mediaId: "",
-        };
-        const sendToApi: any = {
-          id:
-            Math.random().toString(36).substring(2, 15) +
-            Math.random().toString(36).substring(2, 15),
-          name: "Bot",
-          phone: botNumber,
-          type: file.type,
-          message: base64StringWithoutPrefix,
-          timestamp: new Date(),
-          direction: "outgoing",
-          to: specificData.phone,
-          customerId: specificData.id,
-          attendant: specificData.attending,
-          status: "unread",
-          mediaId: "",
-        };
-
-        switch (newMessage.type) {
-          case "text/plain":
-          case "application/vnd.ms-excel":
-          case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-          case "application/msword":
-          case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-          case "application/vnd.ms-powerpoint":
-          case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-          case "application/pdf":
-            Promise.all([
-              //guarda en la base de datos 
-              fetch(frontDocument, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(sendToApi),
-              }).then((response) => {
-                //  console.log("Respuesta de frontDocument:", response);
-              }).catch((error) => {
-                console.error("Error en frontDocument:", error);
-              }),
-              fetch(fileMediaMeta, {
-                //envia el formato a meta
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${metaToken}`,
-                },
-                body: formData,
-              })
-                .then((response) => response.json()
-                )
-                .then((data) => setMediaId(data)
-                ).then(() => console.log("Media ID:", mediaId)
-                )
-                .catch((error) => {
-                  console.error("Error en fileMediaMeta:", error);
-                }),
-              fetch(documentResponse, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  to: specificData.phone,
-                  mediaId: mediaId,
-                  phone: botNumber,
-                  type: file.type,
-                }),
-              }).then((response) => {
-                //  console.log("Respuesta de documentResponse:", response);
-              }).catch((error) => {
-                console.error("Error en documentResponse:", error);
-              }),
-            ]).then(() => {
-              console.log("Todas las solicitudes se han completado con éxito");
-            }).catch((error) => {
-              console.error("Error al enviar las solicitudes:", error);
-            });
-            break;
-          case "image/jpeg":
-          case "image/png":
-          case "image/gif":
-            Promise.all([
-              fetch(frontImage, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(sendToApi),
-              }),
-              fetch(
-                fileMediaMeta,
-                {
-                  method: "POST",
-                  headers: {
-                    Authorization: `Bearer ${metaToken}`,
-                  },
-                  body: formData,
-                }
-              )
-                .then((response) => response.json()
-                )
-                .then((data) => setMediaId(data)
-                ).then(() => console.log("Media ID:", mediaId)
-                )
-              ,
-              fetch(imageResponse, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  to: specificData.phone,
-                  mediaId: mediaId,
-                  phone: botNumber,
-                  type: file.type,
-                }),
-              }),
-            ])
-              .then(() => console.log("Todas las solicitudes se han completado con éxito"))
-              .catch((error) => console.error("Error al enviar las solicitudes:", error));
-            break;
-          case "video/mp4":
-          case "video/quicktime":
-          case "video/mpeg":
-            Promise.all([
-              fetch(frontVideo, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(sendToApi),
-              }),
-              fetch(
-                fileMediaMeta,
-                {
-                  method: "POST",
-                  headers: {
-                    Authorization: `Bearer ${metaToken}`,
-                  },
-                  body: formData,
-                }
-              )
-                .then((response) => response.json()
-                )
-                .then((data) => setMediaId(data)
-                ).then(() => console.log("Media ID:", mediaId)
-                )
-              ,
-              fetch(videoResponse, {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  to: specificData.phone,
-                  mediaId: mediaId,
-                  phone: botNumber,
-                  type: file.type,
-                }),
-              }),
-            ])
-              .then(() => console.log("Todas las solicitudes se han completado con éxito"))
-              .catch((error) => console.error("Error al enviar las solicitudes:", error));
-            break;
-          default:
-            console.log("Tipo de archivo no reconocido");
-            break;
+    switch (fileType) {
+      case "text/plain":
+      case "application/vnd.ms-excel":
+      case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+      case "application/msword":
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+      case "application/vnd.ms-powerpoint":
+      case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+      case "application/pdf":
+        const documentSuccess = await handleDocumentUpload(formData, sendToApi);
+        if (documentSuccess) {
+          toast.success('Documento subido exitosamente!');
+        } else {
+          toast.error('Error al subir el documento');
         }
-
-        setMessages([...messages, newMessage]);
-      };
-      reader.readAsDataURL(file);
+        break;
+      case "image/jpeg":
+      case "image/png":
+      case "image/gif":
+        const imageSuccess = await handleImageUpload(formData, sendToApi);
+        if (imageSuccess) {
+          toast.success('Imagen subida exitosamente!');
+        } else {
+          toast.error('Error al subir la imagen');
+        }
+        break;
+      case "video/mp4":
+      case "video/quicktime":
+      case "video/mpeg":
+        const videoSuccess = await handleVideoUpload(formData, sendToApi);
+        if (videoSuccess) {
+          toast.success('Video subido exitosamente!');
+        } else {
+          toast.error('Error al subir el video');
+        }
+        break;
+      default:
+        console.log("Tipo de archivo no reconocido");
+        break;
     }
   };
-
+  
+  const handleDocumentUpload = async (formData: FormData, sendToApi: any) => {
+    try {
+      const response = await fetch(fileMediaMeta, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${metaToken}` },
+        body: formData,
+      });
+      const data = await response.json();
+      setMediaId(data);
+  
+      if (mediaId) {
+        await fetch(frontDocument, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sendToApi),
+        });
+        await fetch(documentResponse, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: specificData.phone,
+            mediaId: mediaId,
+            phone: botNumber,
+            type: formData.get("type"),
+          }),
+        });
+        return true; // Success
+      } else {
+        console.log("Media ID es vacío o no válido");
+        return false; // Error
+      }
+    } catch (error) {
+      console.error("Error en handleDocumentUpload:", error);
+      return false; // Error
+    }
+  };
+  
+  const handleImageUpload = async (formData: FormData, sendToApi: any) => {
+    try {
+      const response = await fetch(fileMediaMeta, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${metaToken}` },
+        body: formData,
+      });
+      const data = await response.json();
+      setMediaId(data);
+  
+      if (mediaId) {
+        await fetch(frontImage, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sendToApi),
+        });
+        await fetch(imageResponse, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: specificData.phone,
+            mediaId: mediaId,
+            phone: botNumber,
+            type: formData.get("type"),
+          }),
+        });
+        return true; // Success
+      } else {
+        console.log("Media ID es vacío o no válido");
+        return false; // Error
+      }
+    } catch (error) {
+      console.error("Error en handleImageUpload:", error);
+      return false; // Error
+    }
+  };
+  
+  const handleVideoUpload = async (formData: FormData, sendToApi: any) => {
+    try {
+      const response = await fetch(fileMediaMeta, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${metaToken}` },
+        body: formData,
+      });
+      const data = await response.json();
+      setMediaId(data);
+  
+      if (mediaId) {
+        await fetch(frontVideo, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(sendToApi),
+        });
+        await fetch(videoResponse, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: specificData.phone,
+            mediaId: mediaId,
+            phone: botNumber,
+            type: formData.get("type"),
+          }),
+        });
+        return true; // Success
+      } else {
+        console.log("Media ID es vacío o no válido");
+        return false; // Error
+      }
+    } catch (error) {
+      console.error("Error en handleVideoUpload:", error);
+      return false; // Error
+    }
+  };
+  
+  
   const handleVoiceRecording = () => {
     if (isRecording) {
       const newMessage: ChatMessages = {
@@ -532,7 +599,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
             ref={fileInputRef}
             className="hidden"
             onChange={(e) => handleFileUpload(e, "document")}
-            accept=".pdf,.doc,.docx,.txt"
+            accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg,"
           />
           <button
             onClick={handleVoiceRecording}
