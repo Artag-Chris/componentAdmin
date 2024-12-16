@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AppRouter from './router/Router';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -11,6 +11,15 @@ const App: React.FC = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  useEffect(() => {
+    if ("Notification" in window) {
+      if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+      }
+    }
+  }, []);
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
