@@ -9,4 +9,5 @@ export interface ChatMessages {
   timestamp:  Date;
   customerId: number;
   attendant:  number;
+  fileName?:   string;
 }
