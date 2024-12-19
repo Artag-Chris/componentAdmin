@@ -376,7 +376,8 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       const data = await response.json();
       setMediaId(data);
   
-      if (mediaId) {
+      // Esperar a que mediaId se actualice
+      if (data) {
         await fetch(frontDocument, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -387,7 +388,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             to: specificData.phone,
-            mediaId: mediaId,
+            mediaId: data,
             phone: botNumber,
             type: formData.get("type"),
           }),
