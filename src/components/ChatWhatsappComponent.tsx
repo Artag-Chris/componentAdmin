@@ -362,7 +362,7 @@ const handleDocumentUpload = async (formData: FormData, sendToApi: any) => {
     
     if (data.id) {
      const mediaId = data.id;
-      
+     sendToApi.mediaId = data.id;
      await fetch(documentResponse, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -399,8 +399,9 @@ const handleImageUpload = async (formData: FormData, sendToApi: any) => {
       body: formData,
     });
     const data = await response.json();
-
+    
     if (data.id) {
+      sendToApi.mediaId = data.id;
       const mediaId = data.id;
       await fetch(imageResponse, {
         method: "POST",
@@ -412,13 +413,13 @@ const handleImageUpload = async (formData: FormData, sendToApi: any) => {
           type: formData.get("type"),
         }),
       });
-/*
+
       await fetch(frontImage, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(sendToApi),
       });
-     */
+     
       return true; // Success
     } else {
       console.log("Media ID es vacío o no válido");
@@ -439,8 +440,9 @@ const handleVideoUpload = async (formData: FormData, sendToApi: any) => {
     });
     const data = await response.json();
     if (data.id) {
+      sendToApi.mediaId = data.id;
       const mediaId = data.id;
-     
+      
       await fetch(videoResponse, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
