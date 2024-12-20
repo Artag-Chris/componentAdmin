@@ -351,7 +351,6 @@ const handleFileTypeSwitch = async (
 };
 
 const handleDocumentUpload = async (formData: FormData, sendToApi: any) => {
-  console.log("handleDocumentUpload");
   try {
     const response = await fetch(fileMediaMeta, {
       method: "POST",
@@ -364,7 +363,6 @@ const handleDocumentUpload = async (formData: FormData, sendToApi: any) => {
     if (data.id) {
      const mediaId = data.id;
       
-    
      await fetch(documentResponse, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -401,23 +399,26 @@ const handleImageUpload = async (formData: FormData, sendToApi: any) => {
       body: formData,
     });
     const data = await response.json();
+
     if (data.id) {
-      sendToApi.mediaId = data.id;
-      await fetch(frontImage, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sendToApi),
-      });
+      const mediaId = data.id;
       await fetch(imageResponse, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: specificData.phone,
-          mediaId: data.id,
+          mediaId: mediaId,
           phone: botNumber,
           type: formData.get("type"),
         }),
       });
+/*
+      await fetch(frontImage, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sendToApi),
+      });
+     */
       return true; // Success
     } else {
       console.log("Media ID es vacío o no válido");
@@ -438,21 +439,22 @@ const handleVideoUpload = async (formData: FormData, sendToApi: any) => {
     });
     const data = await response.json();
     if (data.id) {
-      sendToApi.mediaId = data.id;
-      await fetch(frontVideo, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sendToApi),
-      });
+      const mediaId = data.id;
+     
       await fetch(videoResponse, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           to: specificData.phone,
-          mediaId: data.id,
+          mediaId,
           phone: botNumber,
           type: formData.get("type"),
         }),
+      });
+      await fetch(frontVideo, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sendToApi),
       });
       return true; // Success
     } else {
