@@ -351,6 +351,15 @@ const handleFileTypeSwitch = async (
 };
 
 const handleDocumentUpload = async (formData: FormData, sendToApi: any) => {
+  const fileName = prompt("Por favor, ingrese el nombre del archivo:");
+  if (!fileName) {
+    toast.error("El nombre del archivo es obligatorio");
+    return false;
+  }
+
+  //formData.append("fileName", fileName);
+  
+
   try {
     const response = await fetch(fileMediaMeta, {
       method: "POST",
@@ -358,28 +367,27 @@ const handleDocumentUpload = async (formData: FormData, sendToApi: any) => {
       body: formData,
     });
     const data = await response.json();
-   
-    
-    if (data.id) {
-     const mediaId = data.id;
-     sendToApi.mediaId = data.id;
-     await fetch(documentResponse, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        to: specificData.phone,
-        mediaId,
-        phone: botNumber,
-        type: formData.get("type"),
-      }),
-    });
 
-       await fetch(frontDocument, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(sendToApi),
-    });
-      
+    if (data.id) {
+      const mediaId = data.id;
+      sendToApi.mediaId = data.id;
+      await fetch(documentResponse, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: specificData.phone,
+          mediaId,
+          phone: botNumber,
+          'nombre':fileName,
+        }),
+      });
+
+      await fetch(frontDocument, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(sendToApi),
+      });
+
       return true; // Success
     } else {
       console.log("Media ID es vacío o no válido");
