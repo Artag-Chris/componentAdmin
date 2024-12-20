@@ -17,13 +17,13 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [wsConnected, setWsConnected] = useState(false);
+  const [forceRender, setForceRender] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
-
-  useEffect(() => {
+  useEffect(() => { 
     // Solicitar permisos de notificaciones al montar el componente
-    if ("Notification" in window && Notification.permission !== "granted") { Notification.requestPermission(); }
-  },
-    []);
+     if ("Notification" in window && Notification.permission !== "granted")
+       { Notification.requestPermission(); } },
+      []);
 
   useEffect(() => {
     if (initialData) {
@@ -53,6 +53,7 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
                 return user;
               });
             } else {
+              setForceRender(prev => !prev); // Forzar renderización
               return [...prevMessages, { phone, WhatsappMessage: [{ message }] }];
             }
           });
@@ -80,15 +81,14 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
     onSelectUser(item);
     setSelectedUserId(item.id || null);
   };
-/*
+
   if (loading) {
     return <TetrisLoader />;
-  }*/
-
-  if (error) {
-    return <div className="text-red-500 p-4 text-center">{error}</div>;
   }
 
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
   return (
     <div className="bg-white text-gray-800 rounded-lg shadow-md overflow-hidden max-w-md mx-auto">
       <div className="p-4 bg-gradient-to-r from-purple-600 to-pink-500">
