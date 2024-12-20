@@ -18,11 +18,12 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
   const [messages, setMessages] = useState<any[]>([]);
   const [wsConnected, setWsConnected] = useState(false);
   const wsRef = useRef<WebSocket | null>(null);
-  useEffect(() => { 
+
+  useEffect(() => {
     // Solicitar permisos de notificaciones al montar el componente
-     if ("Notification" in window && Notification.permission !== "granted")
-       { Notification.requestPermission(); } },
-      []);
+    if ("Notification" in window && Notification.permission !== "granted") { Notification.requestPermission(); }
+  },
+    []);
 
   useEffect(() => {
     if (initialData) {
@@ -31,34 +32,30 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
   }, [initialData]);
 
   useEffect(() => {
-     wsRef.current = new WebSocket(`ws://${url_base}/ws`); wsRef.current.onopen = () => { console.log('Conexión establecida con la API');
-    setWsConnected(true); };
+    wsRef.current = new WebSocket(`ws://${url_base}/ws`);
+    wsRef.current.onopen = () => {
+      console.log('Conexión establecida con la API');
+      setWsConnected(true);
+    };
 
     wsRef.current.onmessage = (event) => {
       try {
         const newData = JSON.parse(event.data);
         if (newData.type === 'broadcast' && newData.payload) {
           const { phone, message } = newData.payload;
-          const existingUser = messages.find((user) => user.phone === phone);
-          if (!existingUser) {
-            // Vuelve a pedir la data inicial si el usuario no está en el arreglo
-            refreshData();
-          } else {
-            setMessages(prevMessages => {
+          setMessages(prevMessages => {
+            const existingUser = prevMessages.find((user) => user.phone === phone);
+            if (existingUser) {
               return prevMessages.map((user) => {
                 if (user.phone === phone) {
-                  // Mostrar notificación
-                  if (document.hidden && Notification.permission === "granted") {
-                    new Notification("Nuevo mensaje", {
-                      body: message,
-                    });
-                  }
-                  return { ...user, WhatsappMessage: [{ message }] };
+                  return { ...user, WhatsappMessage: [...user.WhatsappMessage, { message }] };
                 }
                 return user;
               });
-            });
-          }
+            } else {
+              return [...prevMessages, { phone, WhatsappMessage: [{ message }] }];
+            }
+          });
         } else {
           console.error('Error: La información recibida no es un objeto válido');
         }
@@ -74,18 +71,19 @@ const WhatsappMessagesComponent: React.FC<WhatsappMessagesComponentProps> = ({
     return () => {
       if (wsRef.current) {
         console.log('Cerrando WebSocket');
+        wsRef.current.close();
       }
     };
-  }, [messages]);
+  }, []);
 
   const handleClick = (item: User) => {
     onSelectUser(item);
     setSelectedUserId(item.id || null);
   };
-
+/*
   if (loading) {
     return <TetrisLoader />;
-  }
+  }*/
 
   if (error) {
     return <div className="text-red-500 p-4 text-center">{error}</div>;

@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { Mic, Paperclip, Send, UserCheck, X } from "lucide-react";
+import { Mic, Paperclip, Send, UserCheck,  } from "lucide-react";
 import useSpecificData from "./hook/useSpecificUserData";
-import { ToastContainer, toast } from 'react-toastify'; import 'react-toastify/dist/ReactToastify.css'
+import {  toast } from 'react-toastify'; import 'react-toastify/dist/ReactToastify.css'
 import { Conversation } from "./class/Conversation";
 import { format } from "date-fns/format";
 import { ChatMessages } from "./interfaces/mergedDataMessages";
@@ -376,8 +376,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
       const data = await response.json();
       setMediaId(data);
   
-      // Esperar a que mediaId se actualice
-      if (data) {
+      if (mediaId) {
         await fetch(frontDocument, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -388,7 +387,7 @@ export default function EnhancedWhatsAppChat({ user }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             to: specificData.phone,
-            mediaId: data,
+            mediaId: mediaId,
             phone: botNumber,
             type: formData.get("type"),
           }),

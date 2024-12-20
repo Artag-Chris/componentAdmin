@@ -17,7 +17,6 @@ const HomePage = () => {
     if (loading) {
         return <TetrisLoader />;
     }
-    //console.log(data)
     return (
         <div className="flex flex-col md:flex-row h-screen bg-gradient-to-br from-purple-100 to-pink-100">
             <div className="w-full md:w-4/12 lg:w-3/12 p-4 bg-white shadow-lg rounded-lg md:rounded-r-none">
@@ -33,7 +32,7 @@ const HomePage = () => {
                     <ChatWhatsappComponent user={selectedUser} />
                 ) : (
                     <div className="flex items-center justify-center h-full">
-                        <p className="text-gray-500 text-lg">Select a user to start chatting</p>
+                        <p className="text-gray-500 text-lg">Selecciona un usuario para comenzar la conversación</p>
                     </div>
                 )}
             </div>
