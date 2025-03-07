@@ -10,7 +10,8 @@ const Sidebar: React.FC<SidebarProps> = ({ className }) => {
   const menuItems = [
     { icon: Home, text: 'Home', href: '/' },
     { icon: Mail, text: 'Send Messages', href: '/SendMessages' },
-    { icon: Settings, text: 'Settings', href: '/settings' },
+    { icon: Settings, text: 'deceval', href: '/deceval' },
+    
   ];
 
   return (
